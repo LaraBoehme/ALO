@@ -263,40 +263,40 @@ public class MainFrame {
 		comboBox_jahr.setBounds(415, 49, 100, 25);
 		panel.add(comboBox_jahr);
 
-		JPanel panel_3 = new JPanel();
-		panel_3.setToolTipText("");
-		tabbedPane.addTab("L\u00F6schen", null, panel_3, null);
-		panel_3.setLayout(null);
+		JPanel panelLoeschen = new JPanel();
+		panelLoeschen.setToolTipText("");
+		tabbedPane.addTab("L\u00F6schen", null, panelLoeschen, null);
+		panelLoeschen.setLayout(null);
 
 		JLabel lblwelcherGastSoll = new JLabel();
 		lblwelcherGastSoll.setVerticalAlignment(SwingConstants.TOP);
 		lblwelcherGastSoll.setBounds(10, 9, 169, 32);
 		lblwelcherGastSoll
 				.setText("<html>Welcher Gast soll gel\u00F6scht werden?");
-		panel_3.add(lblwelcherGastSoll);
+		panelLoeschen.add(lblwelcherGastSoll);
 
 		JButton buttonDel = new JButton("L\u00F6schen");
 
 		buttonDel.setBounds(5, 190, 89, 25);
-		panel_3.add(buttonDel);
+		panelLoeschen.add(buttonDel);
 
 		JLabel lblfrWieViele = new JLabel();
 		lblfrWieViele.setVerticalAlignment(SwingConstants.TOP);
 		lblfrWieViele.setBounds(10, 135, 192, 32);
 		lblfrWieViele
 				.setText("<html>F\u00FCr wie viele Tage soll gel\u00F6scht werden?");
-		panel_3.add(lblfrWieViele);
+		panelLoeschen.add(lblfrWieViele);
 
 		JLabel lblabWelchemTag = new JLabel();
 		lblabWelchemTag.setVerticalAlignment(SwingConstants.TOP);
 		lblabWelchemTag.setBounds(10, 93, 183, 31);
 		lblabWelchemTag
 				.setText("<html>Ab welchem Tag soll gel\u00F6scht werden?");
-		panel_3.add(lblabWelchemTag);
+		panelLoeschen.add(lblabWelchemTag);
 
 		txtField_name_del = new JTextField();
 		txtField_name_del.setBounds(240, 6, 179, 20);
-		panel_3.add(txtField_name_del);
+		panelLoeschen.add(txtField_name_del);
 		txtField_name_del.setColumns(10);
 
 		final JComboBox comboBox_tag_del = new JComboBox();
@@ -305,19 +305,19 @@ public class MainFrame {
 				"14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
 				"24", "25", "26", "27", "28", "29", "30", "31" }));
 		comboBox_tag_del.setBounds(240, 90, 70, 25);
-		panel_3.add(comboBox_tag_del);
+		panelLoeschen.add(comboBox_tag_del);
 
 		final JComboBox comboBox_monat_del = new JComboBox();
 		comboBox_monat_del.setModel(new DefaultComboBoxModel(months));
 		comboBox_monat_del.setBounds(305, 90, 120, 25);
-		panel_3.add(comboBox_monat_del);
+		panelLoeschen.add(comboBox_monat_del);
 
 		final JComboBox comboBox_jahr_del = new JComboBox();
 		comboBox_jahr_del.setModel(new DefaultComboBoxModel(new String[] {
 				"2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021",
 				"2022", "2023", "2024", "2025" }));
 		comboBox_jahr_del.setBounds(420, 90, 100, 25);
-		panel_3.add(comboBox_jahr_del);
+		panelLoeschen.add(comboBox_jahr_del);
 
 		final JComboBox comboBox_anzahl = new JComboBox();
 		comboBox_anzahl.setModel(new DefaultComboBoxModel(new String[] { "1",
@@ -325,28 +325,28 @@ public class MainFrame {
 				"14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
 				"24", "25", "26", "27", "28", "29", "30", "31" }));
 		comboBox_anzahl.setBounds(240, 132, 70, 25);
-		panel_3.add(comboBox_anzahl);
+		panelLoeschen.add(comboBox_anzahl);
 
 		JLabel label_3 = new JLabel("Tag(e)");
 		label_3.setBounds(315, 135, 50, 16);
-		panel_3.add(label_3);
+		panelLoeschen.add(label_3);
 
 		JLabel lblAufWelchemStellplatz = new JLabel(
 				"<html>Auf welchem Stellplatz befindet sich der Gast?");
 		lblAufWelchemStellplatz.setVerticalAlignment(SwingConstants.TOP);
 		lblAufWelchemStellplatz.setBounds(10, 52, 192, 32);
-		panel_3.add(lblAufWelchemStellplatz);
+		panelLoeschen.add(lblAufWelchemStellplatz);
 
 		final JComboBox comboBox_sp = new JComboBox();
 		comboBox_sp.setModel(new DefaultComboBoxModel(new String[] { "1", "2",
 				"3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13",
 				"14", "15", "16", "17", "18", "19", "20" }));
 		comboBox_sp.setBounds(362, 49, 70, 25);
-		panel_3.add(comboBox_sp);
+		panelLoeschen.add(comboBox_sp);
 
 		JLabel lblStellplatzNr = new JLabel("Stellplatz Nr:");
 		lblStellplatzNr.setBounds(240, 52, 85, 15);
-		panel_3.add(lblStellplatzNr);
+		panelLoeschen.add(lblStellplatzNr);
 
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("Excel", null, panel_1, null);
