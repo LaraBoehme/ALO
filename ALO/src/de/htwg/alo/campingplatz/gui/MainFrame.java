@@ -166,7 +166,7 @@ public class MainFrame {
 												// from (0, 0, 434, 272)
 		tabbedPane.setSize(1280, 720);
 		frmCampingplatzVerwaltung.getContentPane().add(tabbedPane);
-		JPanel panel = new JPanel();
+		JPanel panelBuchen = new JPanel();
 		tabbedPane.addTab("Buchung", null, panel, null);
 		panel.setLayout(null);
 
