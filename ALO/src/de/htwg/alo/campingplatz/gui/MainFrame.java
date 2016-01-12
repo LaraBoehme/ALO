@@ -38,6 +38,8 @@ import de.htwg.alo.campingplatz.persistence.JavaToExcel;
 import de.htwg.alo.campingplatz.util.DateUtil;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JLabel;
@@ -159,6 +161,9 @@ public class MainFrame {
 		tabbedPane.setBounds(0, 0, 1280, 720);// 1.1 SOSE 2014 - Changed size of
 												// Content Container, Changed
 												// from (0, 0, 434, 272)
+		tabbedPane.setSize(1280, 720);
+		frmCampingplatzVerwaltung.getContentPane().add(tabbedPane);
+
 		// <<<<<<< HEAD
 		JPanel panelBuchung = new JPanel();
 		tabbedPane.addTab("Buchung", null, panelBuchung, null);
@@ -335,30 +340,30 @@ public class MainFrame {
 		lblStellplatzNr.setBounds(240, 52, 85, 15);
 		panelLoeschen.add(lblStellplatzNr);
 
-		JPanel panel_1 = new JPanel();
-		tabbedPane.addTab("Excel", null, panel_1, null);
-		panel_1.setLayout(null);
+		JPanel panelExcel = new JPanel();
+		tabbedPane.addTab("Excel", null, panelExcel, null);
+		panelExcel.setLayout(null);
 
 		JLabel txtpnFrWelchenMonat = new JLabel(
 				"<html>F\u00FCr welchen Monat soll ein Belegungsplan gedruckt werden?</html>");
 		txtpnFrWelchenMonat.setBounds(10, 11, 205, 34);
-		panel_1.add(txtpnFrWelchenMonat);
+		panelExcel.add(txtpnFrWelchenMonat);
 
 		JLabel txtpnFrWelchesJahr = new JLabel();
 		txtpnFrWelchesJahr.setText("<html>F\u00FCr welches Jahr soll ein Belegungsplan gedruckt werden?</html>");
 		txtpnFrWelchesJahr.setBounds(10, 56, 205, 34);
-		panel_1.add(txtpnFrWelchesJahr);
+		panelExcel.add(txtpnFrWelchesJahr);
 
 		JLabel txtpnWoSollDie = new JLabel();
 		txtpnWoSollDie.setText("<html>Wo soll der Belegungsplan gespeichert werden?</html>");
 		txtpnWoSollDie.setBounds(10, 101, 205, 34);
-		panel_1.add(txtpnWoSollDie);
+		panelExcel.add(txtpnWoSollDie);
 
 		final JComboBox comboBoxMonth = new JComboBox();
 		comboBoxMonth.setToolTipText("Januar");
 		comboBoxMonth.setModel(new DefaultComboBoxModel(months));
 		comboBoxMonth.setBounds(300, 11, 120, 25);
-		panel_1.add(comboBoxMonth);
+		panelExcel.add(comboBoxMonth);
 
 		final JComboBox comboBoxYear = new JComboBox();
 		comboBoxYear.setModel(new DefaultComboBoxModel());
@@ -370,19 +375,19 @@ public class MainFrame {
 
 		comboBoxYear.setSelectedIndex(30);
 		comboBoxYear.setBounds(300, 56, 100, 25);
-		panel_1.add(comboBoxYear);
+		panelExcel.add(comboBoxYear);
 
 		final JLabel textPane_speicherOrtBel = new JLabel();
 		textPane_speicherOrtBel.setBounds(141, 146, 278, 14);
-		panel_1.add(textPane_speicherOrtBel);
+		panelExcel.add(textPane_speicherOrtBel);
 		textPane_speicherOrtBel.setBorder(LineBorder.createBlackLineBorder());
 		JButton btnNewButton_waehleSpeicherortBel = new JButton("Ausw\u00E4hlen");
 		btnNewButton_waehleSpeicherortBel.setBounds(300, 100, 110, 25);
-		panel_1.add(btnNewButton_waehleSpeicherortBel);
+		panelExcel.add(btnNewButton_waehleSpeicherortBel);
 
 		final JLabel lblSpeicherort = new JLabel("Speicherort:");
 		lblSpeicherort.setBounds(10, 146, 89, 14);
-		panel_1.add(lblSpeicherort);
+		panelExcel.add(lblSpeicherort);
 
 		// Belegungsplan erstellen
 
@@ -408,29 +413,71 @@ public class MainFrame {
 			}
 		});
 		btnErstellen.setBounds(10, 192, 87, 28);
-		panel_1.add(btnErstellen);
+		panelExcel.add(btnErstellen);
 
 		// SOSE 14 - Oberfläche
 
 		btnPanel.setSize(1000, 1000);
 		btnPanel.setBounds(tabbedPane.getBounds());
-		JPanel panel_4 = new JPanel();
-		panel_4.setPreferredSize(tabbedPane.getSize());// SoSe 2014 - new
-														// Dimension(800, 600));
-		panel_4.setSize(1600, 920);
-		panel_4.setBounds(0, 0, 1600, 920);
+		JPanel panelBelegungsplan = new JPanel();
+		panelBelegungsplan.setPreferredSize(tabbedPane.getSize());// SoSe 2014 -
+																	// new
+		// Dimension(800, 600));
+		panelBelegungsplan.setSize(1600, 920);
+		panelBelegungsplan.setBounds(0, 0, 1600, 920);
 
 		frmCampingplatzVerwaltung.add(new JScrollPane(tabbedPane));
 		frmCampingplatzVerwaltung.pack();
-		tabbedPane.addTab("Belegungsplan", null, panel_4, null);
+		tabbedPane.addTab("Belegungsplan", null, panelBelegungsplan, null);
+
+		// Sebi: Kalender auf aktuelles Datum setzten - wird nicht benötigt für
+		// belegungsplan
+		Calendar cal = new GregorianCalendar(); // new
+
+		if (cal.get(Calendar.MONTH) < 3) {
+			cal.set(cal.get(Calendar.YEAR), 3, 1);
+		}
+		if (cal.get(Calendar.MONTH) > 8) {
+			cal.set(cal.get(Calendar.YEAR) + 1, 3, 1);
+
+		} else {
+
+			cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+		}
+
+		// Sebi: Jahr auswählen für Tabelle
+		JLabel txtpnjahr = new JLabel("<html>Belegungsplan anzeigen für Jahr: </html>");
+		txtpnjahr.setBounds(10, 11, 205, 34);
+		panelBelegungsplan.add(txtpnjahr);
 
 		String[][] tableContent = new String[21][184];// SoSe 2014 - auf 184
 														// days geändert, da
 														// September 30 Tage
 
-		GregorianCalendar first = new GregorianCalendar(2014, GregorianCalendar.APRIL, 1);
-		GregorianCalendar last = new GregorianCalendar(2014, GregorianCalendar.SEPTEMBER, 30);
+		// Sebi: combobox einfügen für auswahl des jahres
+		final JComboBox<Integer> comboBoxYear2 = new JComboBox<Integer>();
+		// comboBoxYear2.setModel(new DefaultComboBoxModel<Integer>());
+
+		for (int n = 2015; n <= 2025; n++) {
+
+			comboBoxYear2.addItem(n);
+		}
+
+		// Sebi: wird nur einmal beim start aufgerufen, zeigt aktuelles jahr an
+		comboBoxYear2.setSelectedIndex(cal.get(Calendar.YEAR) - 2015);
+		panelBelegungsplan.add(comboBoxYear2);
+
+		// Sebi: Start der tabelle festlegen
+		GregorianCalendar first = new GregorianCalendar((int) comboBoxYear2.getSelectedItem(), // change
+																								// "2014"
+				GregorianCalendar.APRIL, 1);
+
+		// Ende wird nie benutzt
+		GregorianCalendar last = new GregorianCalendar((int) comboBoxYear2.getSelectedItem(),
+				GregorianCalendar.SEPTEMBER, 30);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
+
+		System.out.println((int) comboBoxYear2.getSelectedItem());
 
 		String[] columnName = { "Datum", "Platz1", "Platz2", "Platz3", "Platz4", "Platz5", "Platz6", "Platz7", "Platz8",
 				"Platz9", "Platz10", "Platz11", "Platz12", "Platz13", "Platz14", "Platz15", "Platz16", "Platz17",
@@ -440,12 +487,13 @@ public class MainFrame {
 		dtm.setColumnIdentifiers(columnName);
 		dtm.setRowCount(tableContent[0].length);
 
+		// Sebi: Tag +1 für Tabelle im Tool
 		for (int i = 0; i < tableContent[0].length; i++) {
 			dtm.setValueAt(sdf.format(first.getTime()), i, 0);
 			first.add(Calendar.DAY_OF_MONTH, 1);
 		}
-
-		first.set(2014, 3, 1);
+		// Sebi: sagt unnötig
+		// first.set(2015, 3, 1);
 
 		JTable table = new JTable(dtm);
 		table.setEnabled(false);
@@ -464,8 +512,8 @@ public class MainFrame {
 		scrollVert.setPreferredSize(tabbedPane.getSize());
 
 		table.setGridColor(Color.LIGHT_GRAY);
-		panel_4.add(scrollVert, BorderLayout.SOUTH);
-		panel_4.add(btnPanel, BorderLayout.NORTH);
+		panelBelegungsplan.add(scrollVert, BorderLayout.SOUTH);
+		panelBelegungsplan.add(btnPanel, BorderLayout.NORTH);
 
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		frmCampingplatzVerwaltung.setSize((int) tk.getScreenSize().getWidth(),
@@ -473,21 +521,47 @@ public class MainFrame {
 		frmCampingplatzVerwaltung.setDefaultCloseOperation(3);
 		frmCampingplatzVerwaltung.setVisible(true);
 
+		// Sebi: Itemlistener checkbox year
+
+		comboBoxYear2.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+
+				// Tabelle löschen
+				panelBelegungsplan.remove(scrollVert);
+				panelBelegungsplan.remove(btnPanel);
+				// first richtig setzte als selektierte jahreszahl
+				GregorianCalendar first = new GregorianCalendar((int) e.getItem(), // change
+																					// "2014"
+						GregorianCalendar.APRIL, 1);
+				// Tabelle befüllen
+				for (int i = 0; i < tableContent[0].length; i++) {
+					dtm.setValueAt(sdf.format(first.getTime()), i, 0);
+					first.add(Calendar.DAY_OF_MONTH, 1);
+				}
+				// Tabelle Panel hinzufügen
+				panelBelegungsplan.add(scrollVert, BorderLayout.SOUTH);
+				panelBelegungsplan.add(btnPanel, BorderLayout.NORTH);
+
+			}
+		});
+
 		// SOSE14 - Oberfläche
 
-		JPanel panel_2 = new JPanel();
-		tabbedPane.addTab("Einstellungen", null, panel_2, null);
-		panel_2.setLayout(null);
+		JPanel panelEinstellungen = new JPanel();
+		tabbedPane.addTab("Einstellungen", null, panelEinstellungen, null);
+		panelEinstellungen.setLayout(null);
 
 		JButton btnAuswaehlen = new JButton("Ausw\u00E4hlen");
 
 		btnAuswaehlen.setBounds(10, 10, 102, 25);
-		panel_2.add(btnAuswaehlen);
+		panelEinstellungen.add(btnAuswaehlen);
 
 		final JLabel txtpnBelegungsdatei = new JLabel();
 		txtpnBelegungsdatei.setText("Belegungsdatei:");
 		txtpnBelegungsdatei.setBounds(10, 45, 102, 20);
-		panel_2.add(txtpnBelegungsdatei);
+		panelEinstellungen.add(txtpnBelegungsdatei);
 
 		// Speicherort wählen
 		btnNewButton_waehleSpeicherortBel.addActionListener(new ActionListener() {
@@ -513,7 +587,7 @@ public class MainFrame {
 
 		final JLabel textPane_dateiName = new JLabel();
 		textPane_dateiName.setBounds(135, 45, 147, 20);
-		panel_2.add(textPane_dateiName);
+		panelEinstellungen.add(textPane_dateiName);
 		textPane_dateiName.setBorder(LineBorder.createBlackLineBorder());
 
 		// button "EINLESEN"
@@ -534,7 +608,7 @@ public class MainFrame {
 		});
 
 		btnEinlesen.setBounds(10, 76, 102, 25);
-		panel_2.add(btnEinlesen);
+		panelEinstellungen.add(btnEinlesen);
 
 		// button "EINLESEN und überschreiben"
 		JButton btnEinlesenUber = new JButton("Einlesen und überschreiben");
@@ -557,7 +631,7 @@ public class MainFrame {
 		});
 
 		btnEinlesenUber.setBounds(140, 76, 202, 25);
-		panel_2.add(btnEinlesenUber);
+		panelEinstellungen.add(btnEinlesenUber);
 
 		// Klasse, um bei der Auswahl des Belegungsplans nur XML-Dateien
 		// anzuzeigen
@@ -605,9 +679,9 @@ public class MainFrame {
 
 		// Auslastung //WS14/15
 
-		final JPanel panel_6 = new JPanel();
-		tabbedPane.addTab("Auslastung", null, panel_6, null);
-		panel_6.setLayout(null);
+		final JPanel panelAuslastung = new JPanel();
+		tabbedPane.addTab("Auslastung", null, panelAuslastung, null);
+		panelAuslastung.setLayout(null);
 
 		String lblText = "<html>";
 		for (String month : months) {
@@ -621,7 +695,7 @@ public class MainFrame {
 		lblAuslastung.setVerticalAlignment(SwingConstants.TOP);
 		lblAuslastung.setBounds(10, 10, 280, 192);
 		lblAuslastung.setText(lblText);
-		panel_6.add(lblAuslastung); // WS14/15
+		panelAuslastung.add(lblAuslastung); // WS14/15
 
 		// ------------------------------------------------
 		// button 'BUCHEN'
@@ -710,9 +784,9 @@ public class MainFrame {
 				lblAuslastung.setVerticalAlignment(SwingConstants.TOP);
 				lblAuslastung.setBounds(10, 10, 280, 192);
 				lblAuslastung.setText(lblText);
-				panel_6.removeAll();
-				panel_6.add(lblAuslastung);
-				panel_6.updateUI();
+				panelAuslastung.removeAll();
+				panelAuslastung.add(lblAuslastung);
+				panelAuslastung.updateUI();
 				System.out.println(lblText);
 
 				return; // WS 14/15
@@ -811,6 +885,11 @@ public class MainFrame {
 			}
 		});
 		initializeOberflaeche();
+	}
+
+	private void jahr() {
+		// TODO Auto-generated method stub
+
 	}
 
 	private void initializeOberflaeche() {
