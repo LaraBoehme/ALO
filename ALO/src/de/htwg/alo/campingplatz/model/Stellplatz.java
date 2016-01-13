@@ -30,7 +30,7 @@ public class Stellplatz {
 	
 	public Set<DateItem> getBelegungsDates() {
 		DateItem currentItem = firstItem;
-		Set<DateItem> myBelegungen = new HashSet<>();
+		Set<DateItem> myBelegungen = new HashSet<DateItem>();
 		while (currentItem != null) {
 			myBelegungen.add(currentItem);
 			currentItem = currentItem.next;
