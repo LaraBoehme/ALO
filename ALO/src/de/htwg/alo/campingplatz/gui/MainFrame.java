@@ -38,6 +38,8 @@ import de.htwg.alo.campingplatz.persistence.JavaToExcel;
 import de.htwg.alo.campingplatz.util.DateUtil;
 
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JLabel;
@@ -448,10 +450,11 @@ public class MainFrame {
 
 		
 //		4.Belegungsplan
-		btnPanel.setSize(1000, 1000);// SOSE 14 - Oberflaeche
+		btnPanel.setSize(1000, 1000);
 		btnPanel.setBounds(tabbedPane.getBounds());
 		JPanel panelBelegungsplan = new JPanel();
-		panelBelegungsplan.setPreferredSize(tabbedPane.getSize());// SoSe 2014 - new Dimension(800, 600));
+		panelBelegungsplan.setPreferredSize(tabbedPane.getSize());// SoSe 2014 - new
+														// Dimension(800, 600));
 		panelBelegungsplan.setSize(1600, 920);
 		panelBelegungsplan.setBounds(0, 0, 1600, 920);
 
@@ -459,15 +462,59 @@ public class MainFrame {
 		frmCampingplatzVerwaltung.pack();
 		tabbedPane.addTab("Belegungsplan", null, panelBelegungsplan, null);
 
-		String[][] tableContent = new String[21][184];// SoSe 2014 - auf 184
-														// days geaendert, da
-														// September 30 Tage
+		//Sebi: Kalender auf aktuelles Datum setzten - wird nicht benötigt für belegungsplan
+		Calendar cal = new GregorianCalendar(); //new
+		
+		if(cal.get(Calendar.MONTH) < 3){
+			cal.set(cal.get(Calendar.YEAR), 3, 1);
+		}
+		if(cal.get(Calendar.MONTH) > 8){
+			cal.set(cal.get(Calendar.YEAR)+1,3,1);
+			
+		}else{
+			
+			cal.set(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
+		}
+		
+		
+		
+		// Sebi: Jahr auswählen für Tabelle
+		JLabel txtpnjahr = new JLabel(
+				"<html>Belegungsplan anzeigen für Jahr: </html>");
+		txtpnjahr.setBounds(10, 11, 205, 34);
+		panelBelegungsplan.add(txtpnjahr);
 
-		GregorianCalendar first = new GregorianCalendar(2014,
+		String[][] tableContent = new String[21][184];// SoSe 2014 - auf 184
+														// days geändert, da
+														// September 30 Tage
+		
+		//Sebi: combobox einfügen für auswahl des jahres
+		final JComboBox<Integer> comboBoxYear2 = new JComboBox<Integer>();
+		//comboBoxYear2.setModel(new DefaultComboBoxModel<Integer>());
+
+		for (int n = 2015; n <= 2025; n++) {
+
+			comboBoxYear2.addItem(n);
+		}
+		
+		//Sebi: wird nur einmal beim start aufgerufen, zeigt aktuelles jahr an
+		comboBoxYear2.setSelectedIndex(cal.get(Calendar.YEAR)-2015);
+		panelBelegungsplan.add(comboBoxYear2);
+		
+		
+		
+		//Sebi: Start der   tabelle festlegen
+		GregorianCalendar first = new GregorianCalendar((int)comboBoxYear2.getSelectedItem(), //change "2014"
 				GregorianCalendar.APRIL, 1);
-		GregorianCalendar last = new GregorianCalendar(2014,
+		
+		//Ende wird nie benutzt
+		GregorianCalendar last = new GregorianCalendar((int)comboBoxYear2.getSelectedItem(),
 				GregorianCalendar.SEPTEMBER, 30);
-		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
+		
+		System.out.println((int)comboBoxYear2.getSelectedItem());
+
+		
 
 		String[] columnName = { "Datum", "Platz1", "Platz2", "Platz3",
 				"Platz4", "Platz5", "Platz6", "Platz7", "Platz8", "Platz9",
@@ -479,12 +526,13 @@ public class MainFrame {
 		dtm.setColumnIdentifiers(columnName);
 		dtm.setRowCount(tableContent[0].length);
 
+		// Sebi: Tag +1 für Tabelle im Tool 
 		for (int i = 0; i < tableContent[0].length; i++) {
 			dtm.setValueAt(sdf.format(first.getTime()), i, 0);
 			first.add(Calendar.DAY_OF_MONTH, 1);
 		}
-
-		first.set(2014, 3, 1);
+		//Sebi: sagt unnötig
+		//first.set(2015, 3, 1);
 
 		JTable table = new JTable(dtm);
 		table.setEnabled(false);
@@ -512,6 +560,36 @@ public class MainFrame {
 				(((int) tk.getScreenSize().getHeight()) - 100));
 		frmCampingplatzVerwaltung.setDefaultCloseOperation(3);
 		frmCampingplatzVerwaltung.setVisible(true);
+	
+		
+		// Sebi: Itemlistener checkbox year
+		
+		comboBoxYear2.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				
+				//Tabelle löschen
+				panelBelegungsplan.remove(scrollVert);
+				panelBelegungsplan.remove(btnPanel);
+				// first richtig setzte als selektierte jahreszahl
+				GregorianCalendar first = new GregorianCalendar((int) e.getItem(), //change "2014"
+						GregorianCalendar.APRIL, 1);
+				//Tabelle befüllen
+				for (int i = 0; i < tableContent[0].length; i++) {
+					dtm.setValueAt(sdf.format(first.getTime()), i, 0);
+					first.add(Calendar.DAY_OF_MONTH, 1);
+				}
+				//Tabelle Panel hinzufügen
+				panelBelegungsplan.add(scrollVert, BorderLayout.SOUTH);
+				panelBelegungsplan.add(btnPanel, BorderLayout.NORTH);
+				
+				
+				
+				
+			}
+		});
+
 
 		// SOSE14 - Oberflaeche
 
