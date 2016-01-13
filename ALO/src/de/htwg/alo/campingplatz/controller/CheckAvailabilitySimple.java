@@ -19,6 +19,11 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	private int anzahlAbgelehnt = 0;
 	int freieTage;
 
+	public CheckAvailabilitySimple(){
+		
+	}
+	
+	
 	@Override
 	public boolean checkAvailability(Stellplatz[] stellplaetze, Date datum,
 			int dauer, int limit, String name) {
@@ -153,7 +158,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	@Override
 	public Set<String> getAllBelegungenForMonth(Stellplatz[] stellplaetze,				/* WiSe14/15 */
 			String month) {
-		Set<String> belegungen = new HashSet<>();
+		Set<String> belegungen = new HashSet<String>();
 		for (Stellplatz stellplatz : stellplaetze) {
 			
 			if (stellplatz != null) {
