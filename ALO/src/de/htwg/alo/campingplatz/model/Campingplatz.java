@@ -13,9 +13,9 @@ import de.htwg.alo.campingplatz.util.DateUtil;
 
 public class Campingplatz {
 
-	private ArrayList<Stellplatz> stellplaetze = new ArrayList<Stellplatz>();
+	private ArrayList<Stellplatz> stellplaetze = new ArrayList<Stellplatz>();  //Lara geändert von Array zu ArrayList um hinzufügen und löschen zu ermöglichen
 	private ICheckAvailability currentCheck;
-	private int anzahlStellplaetze;
+	private int anzahlStellplaetze;  //Lara hinzugefügt um die anzahl der Stellplätze zu setzen
 
 	public Campingplatz(int anzahlStellplaetze, ICheckAvailability currentCheck) {
 		this.anzahlStellplaetze = anzahlStellplaetze;

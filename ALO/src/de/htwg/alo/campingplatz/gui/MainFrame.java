@@ -119,7 +119,8 @@ public class MainFrame {
 
 	private void initialize() {
 
-//		 Label fuer Protokolle -- um anzuzeigen, ob Belegungsdatei gefunden wurde oder nicht
+//		Label fuer Protokolle -- um anzuzeigen, ob Belegungsdatei gefunden wurde oder nicht
+//		Lara geändert damit man das Label sieht
 //		lblProtocol = new JLabel("");
 		lblProtocol = new JLabel();
 		lblProtocol.setBounds(10, 800, 250, 20);
@@ -489,7 +490,7 @@ public class MainFrame {
 		txtpnjahr.setBounds(10, 11, 205, 34);
 		panelBelegungsplan.add(txtpnjahr);
 
-		String[][] tableContent = new String[21][183];// SoSe 2014 - auf 184  		//WiSe 2015/16 auf 183 Tage geändert, sonst Anzeige von 1.10. dabei
+		String[][] tableContent = new String[21][183];// SoSe 2014 - auf 184  		//Lara auf 183 Tage geändert, sonst Anzeige von 1.10. dabei
 														// days geändert, da
 														// September 30 Tage
 		
@@ -551,6 +552,7 @@ public class MainFrame {
 		TableColumnModel tcm = table.getColumnModel();
 		tcm.getColumn(0).setPreferredWidth(110);
 
+//		um erste Spalte mit Datum zu fixieren beim horizontalem Scrollen
 		JTable fixed = new JTable();
 		fixed.setAutoCreateColumnsFromModel(false);
 		fixed.setModel(table.getModel());
@@ -793,7 +795,7 @@ public class MainFrame {
 		
 //		Ereignisverarbeitung
 		
-
+//		Lara ActionListener für Anzahl Stellplätze verändern
 		eingabeSp.addActionListener(new ActionListener() {
 	
 			public void actionPerformed(ActionEvent e) {
