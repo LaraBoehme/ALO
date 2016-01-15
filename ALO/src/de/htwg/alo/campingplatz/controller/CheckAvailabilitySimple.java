@@ -3,11 +3,7 @@ package de.htwg.alo.campingplatz.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-
-import javax.swing.JOptionPane;
 
 import de.htwg.alo.campingplatz.model.Stellplatz;
 import de.htwg.alo.campingplatz.model.Stellplatz.DateItem;
@@ -25,13 +21,13 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	
 	
 	@Override
-	public boolean checkAvailability(Stellplatz[] stellplaetze, Date datum,
+	public boolean checkAvailability(ArrayList<Stellplatz> stellplaetze, Date datum,     //Stellplatz[] stellplaetze
 			int dauer, int limit, String name) {
 
 		int besterStellplatz = 0;
 		int besteDauer = 0;
-		for (int i = 0; i < stellplaetze.length; i++) {
-			int availability = stellplaetze[i].checkAvailabilitySP(datum);
+		for (int i = 0; i < stellplaetze.size(); i++) {
+			int availability = stellplaetze.get(i).checkAvailabilitySP(datum);
 
 			if (availability >= dauer || availability == -1) {
 
@@ -89,13 +85,13 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 		return false;
 	}
 
-	public int checkAvailabilityTest(Stellplatz[] stellplaetze, Date datum,
+	public int checkAvailabilityTest(ArrayList<Stellplatz> stellplaetze, Date datum,
 			int dauer, int limit, String name) {
 
 		int besterStellplatz = 0;
 		int besteDauer = 0;
-		for (int i = 0; i < stellplaetze.length; i++) {
-			int availability = stellplaetze[i].checkAvailabilitySP(datum);
+		for (int i = 0; i < stellplaetze.size(); i++) {
+			int availability = stellplaetze.get(i).checkAvailabilitySP(datum);
 
 			// if (availability == 0) {
 			// System.out.println(availability + " STELLPLATZ BELEGT");
@@ -128,11 +124,11 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	}
 
 	@Override
-	public void belegeStellplatz(Stellplatz[] stellplaetze,
+	public void belegeStellplatz(ArrayList<Stellplatz> stellplaetze,
 			int stellplatzNummer, Date datum, int dauer, String name) {
 
 		for (int j = 0; j < dauer; j++) {
-			belegeStellplatz(stellplaetze[j], datum, dauer, name); /* WiSe14/15 */
+			belegeStellplatz(stellplaetze.get(j), datum, dauer, name); /* WiSe14/15 */
 
 		}
 	}
@@ -147,16 +143,16 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 		}
 	} /* WiSe14/15 */
 
-	public String[] getBelegungsPlan(Stellplatz[] stellplaetze,
+	public String[] getBelegungsPlan(ArrayList<Stellplatz> stellplaetze,
 			int stellplatzNummer, String monat, int jahr) {
-		String[] tempBelegung = stellplaetze[stellplatzNummer]
+		String[] tempBelegung = stellplaetze.get(stellplatzNummer)
 				.getBelegungsPlanSP(monat, jahr, stellplatzNummer);
 		return tempBelegung;
 
 	}
 
 	@Override
-	public Set<String> getAllBelegungenForMonth(Stellplatz[] stellplaetze,				/* WiSe14/15 */
+	public Set<String> getAllBelegungenForMonth(ArrayList<Stellplatz> stellplaetze,				/* WiSe14/15 */
 			String month) {
 		Set<String> belegungen = new HashSet<String>();
 		for (Stellplatz stellplatz : stellplaetze) {
@@ -185,9 +181,9 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 		return belegungen;
 	}																						/* WiSe14/15 */
 
-	public int removeBelegung(Stellplatz[] stellplaetze, int stellplatzNummer,
+	public int removeBelegung(ArrayList<Stellplatz> stellplaetze, int stellplatzNummer,
 			String name, Date datum) {
-		return stellplaetze[stellplatzNummer - 1].removeBelegung(name, datum);
+		return stellplaetze.get(stellplatzNummer - 1).removeBelegung(name, datum);
 	}
 
 	@Override

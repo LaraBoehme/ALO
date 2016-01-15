@@ -7,6 +7,7 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -46,6 +47,7 @@ import javax.swing.JLabel;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -54,7 +56,7 @@ import java.awt.Toolkit;
 
 public class MainFrame {
 
-	int anzahlStellplaetze = 20;
+	int anzahlStellplaetze = 20; //Default-Einstellung
 	Campingplatz cp = new Campingplatz(anzahlStellplaetze,
 			new CheckAvailabilitySimple());
 	private JFrame frmCampingplatzVerwaltung;
@@ -80,6 +82,7 @@ public class MainFrame {
 	private final String[] stellplaetze = { "1", "2", "3", "4", "5", "6", "7",			// WS 14/15
 			"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
 			"19", "20" };
+//	private String[] stellplaetze;
 
 	/**
 	 * Launch the application.
@@ -117,8 +120,10 @@ public class MainFrame {
 	private void initialize() {
 
 //		 Label fuer Protokolle -- um anzuzeigen, ob Belegungsdatei gefunden wurde oder nicht
-		lblProtocol = new JLabel("");
-		lblProtocol.setVerticalAlignment(SwingConstants.TOP);
+//		lblProtocol = new JLabel("");
+		lblProtocol = new JLabel();
+		lblProtocol.setBounds(10, 800, 250, 20);
+//		lblProtocol.setVerticalAlignment(SwingConstants.TOP);
 
 		File jarFile = new File(MainFrame.class.getProtectionDomain()
 				.getCodeSource().getLocation().getPath());
@@ -249,7 +254,7 @@ public class MainFrame {
 
 			final JComboBox comboBox_StellPlatz = new JComboBox();
 			comboBox_StellPlatz.setModel(new DefaultComboBoxModel(stellplaetze));
-			comboBox_StellPlatz.setBounds(236, 135, 70, 25);
+			comboBox_StellPlatz.setBounds(236, 135, 75, 25);
 			panelBuchen.add(comboBox_StellPlatz);
 
 			JLabel lblStellPlatzNr = new JLabel("Stellplatz Nr.");
@@ -308,7 +313,7 @@ public class MainFrame {
 		
 		final JComboBox comboBox_sp = new JComboBox();
 		comboBox_sp.setModel(new DefaultComboBoxModel(stellplaetze));
-		comboBox_sp.setBounds(362, 49, 70, 25);
+		comboBox_sp.setBounds(362, 49, 75, 25);
 		panelLoeschen.add(comboBox_sp);
 		
 //		Ab welchem Tag soll geloescht werden
@@ -465,17 +470,17 @@ public class MainFrame {
 		//Sebi: Kalender auf aktuelles Datum setzten - wird nicht benötigt für belegungsplan
 		Calendar cal = new GregorianCalendar(); //new
 		
-		if(cal.get(Calendar.MONTH) < 3){
-			cal.set(cal.get(Calendar.YEAR), 3, 1);
+		if(cal.get(Calendar.MONTH) < 4){
+			cal.set(cal.get(Calendar.YEAR), 4, 1);	
+			
 		}
-		if(cal.get(Calendar.MONTH) > 8){
-			cal.set(cal.get(Calendar.YEAR)+1,3,1);
+		if(cal.get(Calendar.MONTH) > 9){
+			cal.set(cal.get(Calendar.YEAR)+1,4,1);
 			
 		}else{
 			
 			cal.set(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH));
 		}
-		
 		
 		
 		// Sebi: Jahr auswählen für Tabelle
@@ -484,7 +489,7 @@ public class MainFrame {
 		txtpnjahr.setBounds(10, 11, 205, 34);
 		panelBelegungsplan.add(txtpnjahr);
 
-		String[][] tableContent = new String[21][184];// SoSe 2014 - auf 184
+		String[][] tableContent = new String[21][183];// SoSe 2014 - auf 184  		//WiSe 2015/16 auf 183 Tage geändert, sonst Anzeige von 1.10. dabei
 														// days geändert, da
 														// September 30 Tage
 		
@@ -540,11 +545,28 @@ public class MainFrame {
 
 		JScrollPane scrollVert = new JScrollPane(table,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setVisible(true);// SoSe 2014 - added
-		table.setAutoResizeMode(table.AUTO_RESIZE_ALL_COLUMNS);
+		table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
 		TableColumnModel tcm = table.getColumnModel();
 		tcm.getColumn(0).setPreferredWidth(110);
+
+		JTable fixed = new JTable();
+		fixed.setAutoCreateColumnsFromModel(false);
+		fixed.setModel(table.getModel());
+		fixed.setSelectionModel(table.getSelectionModel() );
+		fixed.setEnabled(false);
+        TableColumnModel columnModel = table.getColumnModel();
+        TableColumn coulumn = columnModel.getColumn( 0 );
+	    columnModel.removeColumn(coulumn);
+		fixed.getColumnModel().addColumn(coulumn);
+		fixed.setPreferredScrollableViewportSize(fixed.getPreferredSize());
+		fixed.getColumnModel().getColumn(0).setResizable(false);
+		fixed.setGridColor(Color.LIGHT_GRAY);
+		scrollVert.setRowHeaderView(fixed);
+		scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
+
+
 		// SoSe 2014 - for schleife die für alle Colums reziable ausschaltet
 		for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
 			table.getColumnModel().getColumn(i).setResizable(false);
@@ -572,7 +594,7 @@ public class MainFrame {
 				//Tabelle löschen
 				panelBelegungsplan.remove(scrollVert);
 				panelBelegungsplan.remove(btnPanel);
-				// first richtig setzte als selektierte jahreszahl
+				// first richtig setzten als selektierte jahreszahl
 				GregorianCalendar first = new GregorianCalendar((int) e.getItem(), //change "2014"
 						GregorianCalendar.APRIL, 1);
 				//Tabelle befüllen
@@ -599,9 +621,25 @@ public class MainFrame {
 		tabbedPane.addTab("Einstellungen", null, panelEinstellungen, null);
 		panelEinstellungen.setLayout(null);
 		
+		//Lara hinzugefuegt Anzahl Stellplaetze EingabeFeld
+//		Anzahl Stellplätze
+		JLabel anzahlSp = new JLabel("Anzahl Stellpl\u00E4tze:");
+		anzahlSp.setBounds(10, 10, 120, 20);
+		panelEinstellungen.add(anzahlSp);
+		
+		JTextField eingabeSp = new JTextField();
+		eingabeSp.setBounds(170, 10, 50, 20);
+		eingabeSp.setToolTipText("Zahl eingeben und best\u00E4tigen");
+		panelEinstellungen.add(eingabeSp);
+		
+//		Belegungsdatei einlesen
+		JLabel belegdateiHochladen = new JLabel("Belegungsdatei einlesen:");
+		belegdateiHochladen.setBounds(10, 45, 155, 20);
+		panelEinstellungen.add(belegdateiHochladen);
+		
 //		Button Auswaehlen
 		JButton btnAuswaehlen = new JButton("Ausw\u00E4hlen");
-		btnAuswaehlen.setBounds(10, 10, 102, 25);
+		btnAuswaehlen.setBounds(170, 45, 102, 25);
 		panelEinstellungen.add(btnAuswaehlen);
 		
 		// Speicherort waehlen
@@ -631,11 +669,11 @@ public class MainFrame {
 //		Belegungsdatei
 		final JLabel txtpnBelegungsdatei = new JLabel();
 		txtpnBelegungsdatei.setText("Belegungsdatei:");
-		txtpnBelegungsdatei.setBounds(10, 45, 102, 20);
+		txtpnBelegungsdatei.setBounds(10, 80, 102, 20);
 		panelEinstellungen.add(txtpnBelegungsdatei);	
 
 		final JLabel textPane_dateiName = new JLabel();
-		textPane_dateiName.setBounds(135, 45, 147, 20);
+		textPane_dateiName.setBounds(170, 80, 147, 20);
 		panelEinstellungen.add(textPane_dateiName);
 		textPane_dateiName.setBorder(LineBorder.createBlackLineBorder());
 
@@ -658,7 +696,7 @@ public class MainFrame {
 
 			}
 		});
-		btnEinlesen.setBounds(10, 76, 102, 25);
+		btnEinlesen.setBounds(10, 111, 102, 25);
 		panelEinstellungen.add(btnEinlesen);
 
 		// Button "EINLESEN und ueberschreiben"
@@ -667,7 +705,7 @@ public class MainFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (!textPane_dateiName.getText().equalsIgnoreCase("")) {
 
-					cp.resetStellplaetze();
+					cp.resetStellplaetze();  // Lara findet überflüssig
 					cp.newStellplaetze(anzahlStellplaetze);
 					readXml(chosenXml);
 					cp.belegungToXml(dataFolder.getAbsolutePath()
@@ -684,7 +722,7 @@ public class MainFrame {
 			}
 		});
 
-		btnEinlesenUber.setBounds(140, 76, 202, 25);
+		btnEinlesenUber.setBounds(140, 111, 202, 25);
 		panelEinstellungen.add(btnEinlesenUber);
 
 		// Klasse, um bei der Auswahl des Belegungsplans nur XML-Dateien
@@ -754,6 +792,49 @@ public class MainFrame {
 		
 		
 //		Ereignisverarbeitung
+		
+
+		eingabeSp.addActionListener(new ActionListener() {
+	
+			public void actionPerformed(ActionEvent e) {
+				if(eingabeSp.getText()!=""){
+					int anzahlStellplaetze = Integer.parseInt(eingabeSp.getText());
+					System.out.println(anzahlStellplaetze);
+					cp.setAnzahlStellplaetze(anzahlStellplaetze);
+					cp.aendereAnzahlStellplaetze(anzahlStellplaetze);
+				
+					System.out.println(cp.getAnzahlStellplaetze());
+					String[] neueStellplaetze = new String[anzahlStellplaetze];
+					for(int i = 0; i < cp.getAnzahlStellplaetze(); i++){
+						neueStellplaetze[i] = String.valueOf(i+1);
+					}
+					String[] neueStellplaetzeFuerBelegungsplan = new String[anzahlStellplaetze+1];
+					neueStellplaetzeFuerBelegungsplan[0] = "Datum";
+					for(int i = 1; i < cp.getAnzahlStellplaetze()+1;i++){
+						neueStellplaetzeFuerBelegungsplan[i] = "Stellplatz"+String.valueOf(i);
+					}
+					comboBox_StellPlatz.setModel(new DefaultComboBoxModel(neueStellplaetze));
+					comboBox_sp.setModel(new DefaultComboBoxModel(neueStellplaetze));
+					dtm.setColumnIdentifiers(neueStellplaetzeFuerBelegungsplan);
+					
+					JTable fixed = new JTable();
+					fixed.setAutoCreateColumnsFromModel(false);
+					fixed.setModel(table.getModel());
+					fixed.setSelectionModel(table.getSelectionModel() );
+					fixed.setEnabled(false);
+			        TableColumnModel columnModel = table.getColumnModel();
+			        TableColumn coulumn = columnModel.getColumn( 0 );
+				    columnModel.removeColumn(coulumn);
+					fixed.getColumnModel().addColumn(coulumn);
+					fixed.setPreferredScrollableViewportSize(fixed.getPreferredSize());
+					fixed.getColumnModel().getColumn(0).setResizable(false);
+					fixed.setGridColor(Color.LIGHT_GRAY);
+					scrollVert.setRowHeaderView(fixed);
+					scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
+				}
+				
+			}
+		});
 		
 		// button 'BUCHEN'		
 		btnBuchen.addActionListener(new ActionListener() {
@@ -982,7 +1063,10 @@ public class MainFrame {
 						+ "/Belegungen.xml");
 			}
 		});
-		initializeOberflaeche();
+		if (new File(dataFolder.getAbsolutePath() + "\\Belegungen.xml").exists()){
+			initializeOberflaeche();
+		}
+		
 	}
 
 	private void initializeOberflaeche() {

@@ -1,9 +1,9 @@
 package de.htwg.alo.campingplatz.model;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Set;
 
 import de.htwg.alo.campingplatz.controller.ICheckAvailability;
@@ -13,15 +13,24 @@ import de.htwg.alo.campingplatz.util.DateUtil;
 
 public class Campingplatz {
 
-	private Stellplatz[] stellplaetze = null;
+	private ArrayList<Stellplatz> stellplaetze = new ArrayList<Stellplatz>();
 	private ICheckAvailability currentCheck;
+	private int anzahlStellplaetze;
 
 	public Campingplatz(int anzahlStellplaetze, ICheckAvailability currentCheck) {
-		stellplaetze = new Stellplatz[anzahlStellplaetze];
-		for (int i = 0; i < stellplaetze.length; i++) {
-			stellplaetze[i] = new Stellplatz();
+		this.anzahlStellplaetze = anzahlStellplaetze;
+		for(int i = 0; i < anzahlStellplaetze; i++){
+			stellplaetze.add(new Stellplatz());
 		}
 		this.currentCheck = currentCheck;
+	}
+
+	public int getAnzahlStellplaetze() {
+		return anzahlStellplaetze;
+	}
+
+	public void setAnzahlStellplaetze(int anzahlStellplaetze) {
+		this.anzahlStellplaetze = anzahlStellplaetze;
 	}
 
 	public boolean checkAvailability(Date datum, int dauer, int limit,
@@ -35,7 +44,7 @@ public class Campingplatz {
 																		 * 15
 																		 */
 			String name, int stellplatzNummber) {
-		return currentCheck.checkAvailability(stellplaetze[stellplatzNummber],
+		return currentCheck.checkAvailability(stellplaetze.get(stellplatzNummber),
 				datum, dauer, limit, name, stellplatzNummber);
 	}
 
@@ -115,16 +124,14 @@ public class Campingplatz {
 
 	}
 
-	public void resetStellplaetze() {
+	public void resetStellplaetze() { // Lara findet überflüssig
 		this.stellplaetze = null;
 	}
 
 	public void newStellplaetze(int anzahlStellplaetze) {
 		this.stellplaetze = null;
-
-		stellplaetze = new Stellplatz[anzahlStellplaetze];
-		for (int i = 0; i < stellplaetze.length; i++) {
-			stellplaetze[i] = new Stellplatz();
+		for (int i = 0; i < anzahlStellplaetze; i++) {
+			stellplaetze.add(new Stellplatz());
 		}
 	}
 
@@ -145,5 +152,21 @@ public class Campingplatz {
 			MainFrame.dtm.setValueAt("", row++, col);
 		}
 
+	}
+	
+	public void aendereAnzahlStellplaetze(int anzahlStellplaetze){
+		if(stellplaetze.size() >= anzahlStellplaetze){
+			int anzahlLoeschen = stellplaetze.size()-anzahlStellplaetze;
+			int loeschen = stellplaetze.size() - 1;
+			for(int i = 0; i < anzahlLoeschen; i++){
+				stellplaetze.remove(loeschen);
+				loeschen--;
+			}
+		}else{
+			int anzahlHinzufuegen = anzahlStellplaetze-stellplaetze.size();
+			for(int i = 0; i < anzahlHinzufuegen; i++){
+				stellplaetze.add(new Stellplatz());
+			}
+		}
 	}
 }

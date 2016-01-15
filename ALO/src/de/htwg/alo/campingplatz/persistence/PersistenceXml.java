@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,17 +21,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class PersistenceXml {
-	public static void belegungenToXml(Stellplatz[] stellplaetze, String outPath) {
+	public static void belegungenToXml(ArrayList<Stellplatz> stellplaetze, String outPath) {
 
 		// XML-header
 		StringBuilder sb = new StringBuilder();
 		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		sb.append("<Campingplatz>");
 		int stellplatzNr = 0;
-		Stellplatz[] arrayOfStellplatz = stellplaetze;
-		int j = stellplaetze.length;
+		ArrayList<Stellplatz> arrayOfStellplatz = stellplaetze;
+		int j = stellplaetze.size();
 		for (int i = 0; i < j; i++) {
-			Stellplatz stellplatz = arrayOfStellplatz[i];
+			Stellplatz stellplatz = arrayOfStellplatz.get(i);
 			stellplatzNr++;
 
 			Stellplatz.DateItem currItem = stellplatz.getBelegungen();
