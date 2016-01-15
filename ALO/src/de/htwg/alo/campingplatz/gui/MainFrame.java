@@ -65,10 +65,7 @@ public class MainFrame {
 	private String chosenXml = "";
 	private File dataFolder;
 	private JLabel lblProtocol;
-	private JPanel btnPanel = new JPanel(new GridLayout(1, 2)); // V1.1 SOSE
-																// 2014 - Neu
-																// fuer
-																// Oberflaeche
+
 	public static DefaultTableModel dtm; // V1.1 SOSE 2014 - Neu für Oberfläche
 
 	private final String[] months = {
@@ -120,7 +117,7 @@ public class MainFrame {
 	private void initialize() {
 
 //		Label fuer Protokolle -- um anzuzeigen, ob Belegungsdatei gefunden wurde oder nicht
-//		Lara geändert damit man das Label sieht
+//		Lara geändert damit man das Label sieht & alles richtig angezeigt wird oder erstellt wird
 //		lblProtocol = new JLabel("");
 		lblProtocol = new JLabel();
 		lblProtocol.setBounds(10, 800, 250, 20);
@@ -128,16 +125,19 @@ public class MainFrame {
 
 		File jarFile = new File(MainFrame.class.getProtectionDomain()
 				.getCodeSource().getLocation().getPath());
+		
 		dataFolder = new File(jarFile.getAbsolutePath().replace(
 				jarFile.getName(), "")
-				+ "/data/");
+				+ "data/");
+
 		if (!dataFolder.exists()) {
 			dataFolder.mkdirs();
+			System.out.println("Ordner erstellt.");
 		}
-
-		if (new File(dataFolder.getAbsolutePath() + "\\Belegungen.xml")
+		
+		if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml")
 				.exists()) {
-			readXml(dataFolder.getAbsolutePath() + "\\Belegungen.xml");
+			readXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 			lblProtocol.setText("Belegungsdatei erfolgreich geladen...");
 
 		} else {
@@ -456,13 +456,14 @@ public class MainFrame {
 
 		
 //		4.Belegungsplan
-		btnPanel.setSize(1000, 1000);
+//		btnPanel.setSize(1000, 1000);
+		JPanel btnPanel = new JPanel(); // V1.1 SOSE014 - Neu
 		btnPanel.setBounds(tabbedPane.getBounds());
 		JPanel panelBelegungsplan = new JPanel();
 		panelBelegungsplan.setPreferredSize(tabbedPane.getSize());// SoSe 2014 - new
 														// Dimension(800, 600));
-		panelBelegungsplan.setSize(1600, 920);
-		panelBelegungsplan.setBounds(0, 0, 1600, 920);
+//		panelBelegungsplan.setSize(1600, 920);
+//		panelBelegungsplan.setBounds(0, 0, 1600, 920);
 
 		frmCampingplatzVerwaltung.add(new JScrollPane(tabbedPane));
 		frmCampingplatzVerwaltung.pack();
@@ -550,7 +551,7 @@ public class MainFrame {
 		table.setVisible(true);// SoSe 2014 - added
 		table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
 		TableColumnModel tcm = table.getColumnModel();
-		tcm.getColumn(0).setPreferredWidth(110);
+		tcm.getColumn(0).setPreferredWidth(90);
 
 //		um erste Spalte mit Datum zu fixieren beim horizontalem Scrollen
 		JTable fixed = new JTable();
@@ -569,10 +570,10 @@ public class MainFrame {
 		scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
 
 
-		// SoSe 2014 - for schleife die für alle Colums reziable ausschaltet
-		for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
-			table.getColumnModel().getColumn(i).setResizable(false);
-		}
+//		// SoSe 2014 - for schleife die für alle Colums reziable ausschaltet
+//		for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+//			table.getColumnModel().getColumn(i).setResizable(false);
+//		}
 		scrollVert.setPreferredSize(tabbedPane.getSize());
 
 		table.setGridColor(Color.LIGHT_GRAY);
@@ -580,7 +581,7 @@ public class MainFrame {
 		panelBelegungsplan.add(btnPanel, BorderLayout.NORTH);
 
 		Toolkit tk = Toolkit.getDefaultToolkit();
-		frmCampingplatzVerwaltung.setSize((int) tk.getScreenSize().getWidth(),
+		frmCampingplatzVerwaltung.setSize((int) tk.getScreenSize().getWidth() - 11,
 				(((int) tk.getScreenSize().getHeight()) - 100));
 		frmCampingplatzVerwaltung.setDefaultCloseOperation(3);
 		frmCampingplatzVerwaltung.setVisible(true);
