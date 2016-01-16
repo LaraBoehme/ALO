@@ -892,7 +892,7 @@ public class MainFrame {
 									.getSelectedIndex()); /* WiSe14/15 */
 
 					JOptionPane.showMessageDialog(null,
-							"<html>Buchung erfolgreich!<br>Um die Änderungen anzuziegen, bitte Belegungsplan erneut erstellen!");
+							"<html>Buchung erfolgreich!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
 					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 
 					initializeOberflaeche();
@@ -980,7 +980,7 @@ public class MainFrame {
 								"<html>Der Gast " + txtField_name_del
 										.getText() + " wurde ab dem Datum " + myDate + " vom Stellplatz " + platz
 								+ " für die angegebene Dauer von " + dauer
-								+ " Tag(en) gelöscht!<br>Um die Änderungen anzuziegen, bitte Belegungsplan erneut erstellen!");
+								+ " Tag(en) gelöscht!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
 						cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 						readXml(dataFolder.getAbsolutePath() + "\\Belegungen.xml");
 						removeFromOberflaeche(txtField_name_del.getText(), platz, myDate, dauer);
@@ -991,7 +991,7 @@ public class MainFrame {
 								"<html>Der Gast " + txtField_name_del
 										.getText() + " wurde ab dem Datum " + myDate + " vom Stellplatz " + platz
 								+ " entfernt, jedoch nicht für die angegebene Dauer von " + dauer
-								+ " Tag(en). Bitte überprüfen Sie den Belegungsplan!<br>Um die änderungen anzuziegen, bitte Belegungsplan erneut erstellen!");
+								+ " Tag(en). Bitte überprüfen Sie den Belegungsplan!<br>Um die änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
 						cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 						initializeOberflaeche();
 
