@@ -2,6 +2,7 @@ package de.htwg.alo.campingplatz.model;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
@@ -43,9 +44,9 @@ public class Campingplatz {
 																		 * WiSe14/
 																		 * 15
 																		 */
-			String name, int stellplatzNummber) {
-		return currentCheck.checkAvailability(stellplaetze.get(stellplatzNummber),
-				datum, dauer, limit, name, stellplatzNummber);
+			String name, int stellplatzIndex) {
+		return currentCheck.checkAvailability(stellplaetze.get(stellplatzIndex),
+				datum, dauer, limit, name);
 	}
 
 	public int checkAvailabilityTest(Date datum, int dauer, int limit,
@@ -54,9 +55,9 @@ public class Campingplatz {
 				limit, name);
 	}
 
-	public void belegeStellplatz(int stellplatzNummer, Date datum, int dauer,
+	public void belegeStellplatz(int stellplatzIndex, Date datum, int dauer,
 			String name) {
-		currentCheck.belegeStellplatz(stellplaetze, stellplatzNummer, datum,
+		currentCheck.belegeStellplatz(stellplaetze, stellplatzIndex, datum,
 				dauer, name);
 	}
 
@@ -92,23 +93,35 @@ public class Campingplatz {
 	}
 
 	// V1.1 SoSe 2014
-	public void belegeStellplatzAufGUI(int stellplatzNr, Date datumVon,
+	public void belegeStellplatzAufGUI(int stellplatzIndex, Date datumVon,
 			int dauer, String name) {
 
-		GregorianCalendar first = new GregorianCalendar(2014,
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(datumVon);
+		int jahr = cal.get(Calendar.YEAR);
+		System.out.println(jahr);
+				
+		GregorianCalendar first = new GregorianCalendar(jahr,
 				GregorianCalendar.APRIL, 1);
-		GregorianCalendar last = new GregorianCalendar(2014,
-				GregorianCalendar.SEPTEMBER, 30);
+//		GregorianCalendar last = new GregorianCalendar(jahr,
+//				GregorianCalendar.SEPTEMBER, 30);
+//		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
-		int col = stellplatzNr + 1;// +1 da die erste Spalte f�r das Label Datum
+		int col = stellplatzIndex + 1;// +1 da die erste Spalte f�r das Label Datum
 									// verwendet wird
 		int row = 0;
-		long result = last.getTimeInMillis() - first.getTimeInMillis();
-		result = result / (1000 * 60 * 60 * 24); // umrechnung in Tage
-		int length = (int) result;
-		GregorianCalendar tempCal = new GregorianCalendar(2014,
+		
+//		long result = last.getTimeInMillis() - first.getTimeInMillis();
+//		result = result / (1000 * 60 * 60 * 24); // umrechnung in Tage
+//		int length = (int) result;
+		int length = 183;
+		System.out.println(length);
+		
+		GregorianCalendar tempCal = new GregorianCalendar(jahr,
 				GregorianCalendar.APRIL, 1);
 		Date tempDate = tempCal.getTime();
+		System.out.println(tempDate);
+		
 		for (int i = 0; i < length; i++) {
 			if (tempDate.equals(datumVon)) {
 				row = i;
@@ -118,8 +131,15 @@ public class Campingplatz {
 		}
 
 		for (int j = 0; j < dauer; j++) {
-			MainFrame.dtm.setValueAt(name, row, col);
-			row++;
+			String datumKalender = MainFrame.dtm.getValueAt(0, 0).toString();
+			System.out.println(datumKalender);
+			String datumRichtig = sdf.format(first.getTime());
+			System.out.println(datumRichtig);
+			if(datumKalender.compareTo(datumRichtig)==0){
+				System.out.println("Geschafft");
+				MainFrame.dtm.setValueAt(name, row, col);
+				row++;
+			}
 		}
 
 	}

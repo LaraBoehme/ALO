@@ -53,7 +53,8 @@ public class PersistenceXml {
 				sb.append("<Name>" + name + "</Name>");
 				sb.append("</Belegung>");
 				
-				currItem = currItem.next;//V1.1 SoSe 2014 - Ersetzt Code unten: nur noch DatumVon in XML, vorher immer 2 Objekte pro Buchung
+				currItem = currItem.next;
+				System.out.println(currItem);//V1.1 SoSe 2014 - Ersetzt Code unten: nur noch DatumVon in XML, vorher immer 2 Objekte pro Buchung
 				//if (currItem == myFirstItem) {
 				//	currItem = currItem.next;
 				//}
@@ -89,8 +90,9 @@ public class PersistenceXml {
 			Document doc = dBuilder.parse(fXmlFile);
 
 			doc.getDocumentElement().normalize();
-
+			
 			NodeList nList = doc.getElementsByTagName("Belegung");
+			System.out.println(nList.getLength());
 
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 
@@ -99,8 +101,20 @@ public class PersistenceXml {
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
 					Element eElement = (Element) nNode;
-
 					
+					System.out.println(Integer.parseInt(eElement
+									.getElementsByTagName("Stellplatz").item(0)
+									.getTextContent()) - 1);
+					System.out.println(DateUtil.getInstance().formatString(
+									eElement.getElementsByTagName("DatumVon")
+											.item(0).getTextContent()));
+					System.out.println(Integer
+									.parseInt(eElement
+											.getElementsByTagName("Dauer")
+											.item(0).getTextContent()));
+					System.out.println(eElement.getElementsByTagName("Name").item(0)
+									.getTextContent());
+
 					cp.belegeStellplatzAufGUI(
 							Integer.parseInt(eElement
 									.getElementsByTagName("Stellplatz").item(0)

@@ -79,10 +79,9 @@ public class MainFrame {
 	};
 
 	private final String[] stellplaetze = { "1", "2", "3", "4", "5", "6", "7", // WS
-																				// 14/15
+																				// 14/15       //Default-Einstellung
 			"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
-	// private String[] stellplaetze;
-
+	
 	/**
 	 * Launch the application.
 	 */
@@ -107,7 +106,7 @@ public class MainFrame {
 	 */
 	public MainFrame() {
 		initialize();
-		resetOberflaeche(); /* WS14/15 - löscht alle Einträge nach Neustart */
+//		resetOberflaeche(); /* WS14/15 - löscht alle Einträge nach Neustart */
 
 	}
 
@@ -124,7 +123,6 @@ public class MainFrame {
 		// lblProtocol = new JLabel("");
 		lblProtocol = new JLabel();
 		lblProtocol.setBounds(10, 800, 250, 20);
-		// lblProtocol.setVerticalAlignment(SwingConstants.TOP);
 
 		File jarFile = new File(MainFrame.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
@@ -165,7 +163,7 @@ public class MainFrame {
 
 		// ****************************************************************************************************************************
 		frmCampingplatzVerwaltung.setLayout(new BorderLayout());
-		frmCampingplatzVerwaltung.setPreferredSize(new Dimension(1280, 720));// 1.1
+		frmCampingplatzVerwaltung.setPreferredSize(new Dimension(1615, 750));// 1.1
 																				// SOSE
 																				// 2014
 																				// -
@@ -235,7 +233,6 @@ public class MainFrame {
 		comboBox_tag.setSelectedIndex(cal.get(Calendar.DAY_OF_MONTH) - 1);
 		panelBuchen.add(comboBox_tag);
 
-		comboBox_tag.getModel();
 
 		// Monat
 		final JComboBox comboBox_monat = new JComboBox();
@@ -595,6 +592,20 @@ public class MainFrame {
 				// Tabelle löschen
 				panelBelegungsplan.remove(scrollVert);
 				panelBelegungsplan.remove(btnPanel);
+				
+//				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
+				for(int i = 0; i < tableContent[0].length; i++){
+					System.out.println("Zeile "+i);
+					for(int j = 1; j < cp.getAnzahlStellplaetze()+1;j++){
+						System.out.println("Spalte "+j);
+						if(dtm.getValueAt(i, j) != null){
+							System.out.println("null");
+							dtm.setValueAt(null, i, j);
+						}
+						System.out.println("nicht null");
+					}	
+				}
+				
 				// first richtig setzten als selektierte jahreszahl
 				GregorianCalendar first = new GregorianCalendar((int) e.getItem(), // change
 																					// "2014"
@@ -607,6 +618,11 @@ public class MainFrame {
 				// Tabelle Panel hinzufügen
 				panelBelegungsplan.add(scrollVert, BorderLayout.SOUTH);
 				panelBelegungsplan.add(btnPanel, BorderLayout.NORTH);
+				
+				//Lara Belegungsplan richtig anzeigen für spezielles Jahr
+				if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+					initializeOberflaeche();
+				}
 
 			}
 		});
@@ -1010,10 +1026,10 @@ public class MainFrame {
 				cp.xmlToBelegung(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 			}
 		});
-		if (new File(dataFolder.getAbsolutePath() + "\\Belegungen.xml").exists()) {
+		
+		if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
 			initializeOberflaeche();
 		}
-
 	}
 
 	private void initializeOberflaeche() {

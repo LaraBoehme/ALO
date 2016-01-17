@@ -11,17 +11,17 @@ public interface ICheckAvailability {
 	boolean checkAvailability(ArrayList<Stellplatz> stellplaetze, Date datum, int dauer,
 			int limit, String name);
 
-    boolean checkAvailability(Stellplatz stellplaetze, Date datum, int dauer,			/* WiSe14/15 */
-    								int limit, String name, int stellplatzNummber);
+    boolean checkAvailability(Stellplatz stellplatz, Date datum, int dauer,			/* WiSe14/15 */
+    								int limit, String name);
 
 	int checkAvailabilityTest(ArrayList<Stellplatz> stellplaetze, Date datum, int dauer,
 			int limit, String name);
 
 
-	void belegeStellplatz(ArrayList<Stellplatz> stellplaetze, int stellplatzNummer,
+	void belegeStellplatz(ArrayList<Stellplatz> stellplaetze, int stellplatzIndex,
 			Date datum, int dauer, String name);
 
-	 void belegeStellplatz(Stellplatz stellplaetze,										/* WiSe14/15 */
+	 void belegeStellplatz(Stellplatz stellplatz,										/* WiSe14/15 */
                           Date datum, int dauer, String name);
 
 	String[] getBelegungsPlan(ArrayList<Stellplatz> stellplaetze, int stellplatzNummer,

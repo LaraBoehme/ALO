@@ -18,6 +18,7 @@ public class Stellplatz {
 		String[] myBelegungen = new String[1000];
 		int i = 0;
 		while (currentItem != null) {
+			System.out.println(currentItem.getDate());
 			myBelegungen[i] = currentItem.getName() + "_"
 					+ DateUtil.getInstance().formatDate(currentItem.getDate());
 			i++;
@@ -47,10 +48,14 @@ public class Stellplatz {
 			lastItem = firstItem;
 
 		} else {
+			System.out.println("Datum: "+datum);
+			System.out.println("FirstItem: "+firstItem.getDate());
+			System.out.println("LastItem: "+lastItem.getDate());
 			// neues Datum hinter dem bisherigen letzten
 			if (lastItem.getDate().before(datum)) {
 				lastItem.next = new DateItem(datum, name);
 				lastItem = lastItem.next;
+				System.out.println("if " + lastItem.getDate());
 				return;
 
 				// neues Datum vor dem ersten
@@ -63,6 +68,7 @@ public class Stellplatz {
 			}
 			DateItem currentItem = firstItem;
 			while (currentItem.next != null) {
+				System.out.println("Ja hier bin ich");
 				// neues Datum nach dem Ersten und vor dem n�chsten
 				if (currentItem.getDate().before(datum)
 						&& currentItem.next.getDate().after(datum)) {

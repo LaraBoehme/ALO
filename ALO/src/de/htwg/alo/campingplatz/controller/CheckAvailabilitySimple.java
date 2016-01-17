@@ -57,23 +57,25 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	}
 
 	@Override
-	/* NEU */public boolean checkAvailability(Stellplatz stellplaetze,
-			Date datum, int dauer, int limit, String name, int stellplatzNummer) {
+	/* NEU */public boolean checkAvailability(Stellplatz stellplatz,
+			Date datum, int dauer, int limit, String name) {
 
-		int availability = stellplaetze.checkAvailabilitySP(datum);
+		int availability = stellplatz.checkAvailabilitySP(datum);
+		System.out.println(availability);
 
 		if (availability >= dauer || availability == -1) {
-			belegeStellplatz(stellplaetze, datum, dauer, name);
+			belegeStellplatz(stellplatz, datum, dauer, name);
 			anzahlAngenommen++;
+			System.out.println("true");
 			return true;
 		} else if (availability == 0) {
-			belegeStellplatz(stellplaetze, datum, dauer, name);
+			belegeStellplatz(stellplatz, datum, dauer, name);
 			anzahlAngenommen++;
 			return false;
 
 			// System.out.println("checkAvaiability: 0 -> bereits belegt");
 		} else {
-			belegeStellplatz(stellplaetze, datum, dauer, name);
+			belegeStellplatz(stellplatz, datum, dauer, name);
 			anzahlAngenommen++;
 			System.out
 					.println("checkAvailability: false ----- DAUER > VERFÜGBARKEIT");
@@ -125,20 +127,22 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 
 	@Override
 	public void belegeStellplatz(ArrayList<Stellplatz> stellplaetze,
-			int stellplatzNummer, Date datum, int dauer, String name) {
+			int stellplatzIndex, Date datum, int dauer, String name) {
 
 		for (int j = 0; j < dauer; j++) {
-			belegeStellplatz(stellplaetze.get(j), datum, dauer, name); /* WiSe14/15 */
+			System.out.println(j+1);
+			belegeStellplatz(stellplaetze.get(stellplatzIndex), datum, dauer, name); /* WiSe14/15 */   //Lara statt j wird hier der stellplatzIndex übergeben
 
 		}
 	}
 
 	@Override
-	public void belegeStellplatz(Stellplatz stellplaetze, Date datum,
+	public void belegeStellplatz(Stellplatz stellplatz, Date datum,
 			int dauer, String name) { /* WiSe14/15 */
 
 		for (int j = 0; j < dauer; j++) {
-			stellplaetze.addDate(datum, name);
+			System.out.println(datum);
+			stellplatz.addDate(datum, name);
 			datum = new Date(datum.getTime() + 24 * 60 * 60 * 1000);
 		}
 	} /* WiSe14/15 */
@@ -157,11 +161,13 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 		Set<String> belegungen = new HashSet<String>();
 		for (Stellplatz stellplatz : stellplaetze) {
 			
+			
 			if (stellplatz != null) {
 				for (String belegung : stellplatz.getBelegungenAsString()) {
 					Set<DateItem> stellplatzBelegung = stellplatz
 							.getBelegungsDates();
 					// because of String[1000]
+					
 					if (belegung != null && belegung.length() > 2) {
 						System.out.println("belegung: "+ belegung);
 
@@ -172,6 +178,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 							if (dateUtil.getMonth(date).equals(month)) {
 								System.out.println("added date!");
 								belegungen.add(belegung);
+								System.out.println(belegungen.size());
 							}
 						}
 					}
