@@ -22,7 +22,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	
 	@Override
 	public boolean checkAvailability(ArrayList<Stellplatz> stellplaetze, Date datum,     //Stellplatz[] stellplaetze
-			int dauer, int limit, String name) {
+			int dauer, int limit, String name, String zusatzInfos) {
 
 		int besterStellplatz = 0;
 		int besteDauer = 0;
@@ -31,7 +31,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 
 			if (availability >= dauer || availability == -1) {
 
-				belegeStellplatz(stellplaetze, i, datum, dauer, name);
+				belegeStellplatz(stellplaetze, i, datum, dauer, name, zusatzInfos);
 				anzahlAngenommen++;
 				return true;
 			} else if (availability > 0) {
@@ -47,9 +47,9 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 			Date neuesDatum = new Date(datum.getTime() + (24 * 60 * 60 * 1000)
 					* (besteDauer));
 			belegeStellplatz(stellplaetze, besterStellplatz, datum, besteDauer,
-					name);
+					name, zusatzInfos);
 			return checkAvailability(stellplaetze, neuesDatum, neueDauer,
-					limit, name);
+					limit, name, zusatzInfos);
 		}
 
 		anzahlAbgelehnt++;
@@ -58,24 +58,24 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 
 	@Override
 	/* NEU */public boolean checkAvailability(Stellplatz stellplatz,
-			Date datum, int dauer, int limit, String name) {
+			Date datum, int dauer, int limit, String name, String zusatzInfos) {
 
 		int availability = stellplatz.checkAvailabilitySP(datum);
 		System.out.println(availability);
 
 		if (availability >= dauer || availability == -1) {
-			belegeStellplatz(stellplatz, datum, dauer, name);
+			belegeStellplatz(stellplatz, datum, dauer, name, zusatzInfos);
 			anzahlAngenommen++;
 			System.out.println("true");
 			return true;
 		} else if (availability == 0) {
-			belegeStellplatz(stellplatz, datum, dauer, name);
+			belegeStellplatz(stellplatz, datum, dauer, name, zusatzInfos);
 			anzahlAngenommen++;
 			return false;
 
 			// System.out.println("checkAvaiability: 0 -> bereits belegt");
 		} else {
-			belegeStellplatz(stellplatz, datum, dauer, name);
+			belegeStellplatz(stellplatz, datum, dauer, name, zusatzInfos);
 			anzahlAngenommen++;
 			System.out
 					.println("checkAvailability: false ----- DAUER > VERFÜGBARKEIT");
@@ -88,7 +88,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	}
 
 	public int checkAvailabilityTest(ArrayList<Stellplatz> stellplaetze, Date datum,
-			int dauer, int limit, String name) {
+			int dauer, int limit, String name, String zusatzInfos) {
 
 		int besterStellplatz = 0;
 		int besteDauer = 0;
@@ -119,7 +119,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 			Date neuesDatum = new Date(datum.getTime() + (24 * 60 * 60 * 1000)
 					* (besteDauer));
 			return checkAvailabilityTest(stellplaetze, neuesDatum, neueDauer,
-					limit, name);
+					limit, name, zusatzInfos);
 		}
 
 		return dauer;
@@ -127,22 +127,22 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 
 	@Override
 	public void belegeStellplatz(ArrayList<Stellplatz> stellplaetze,
-			int stellplatzIndex, Date datum, int dauer, String name) {
+			int stellplatzIndex, Date datum, int dauer, String name, String zusatzInfos) {
 
 		for (int j = 0; j < dauer; j++) {
 			System.out.println(j+1);
-			belegeStellplatz(stellplaetze.get(stellplatzIndex), datum, dauer, name); /* WiSe14/15 */   //Lara statt j wird hier der stellplatzIndex übergeben
+			belegeStellplatz(stellplaetze.get(stellplatzIndex), datum, dauer, name, zusatzInfos); /* WiSe14/15 */   //Lara statt j wird hier der stellplatzIndex übergeben
 
 		}
 	}
 
 	@Override
 	public void belegeStellplatz(Stellplatz stellplatz, Date datum,
-			int dauer, String name) { /* WiSe14/15 */
+			int dauer, String name, String zusatzInfos) { /* WiSe14/15 */
 
 		for (int j = 0; j < dauer; j++) {
 			System.out.println(datum);
-			stellplatz.addDate(datum, name);
+			stellplatz.addDate(datum, name, zusatzInfos);
 			datum = new Date(datum.getTime() + 24 * 60 * 60 * 1000);
 		}
 	} /* WiSe14/15 */

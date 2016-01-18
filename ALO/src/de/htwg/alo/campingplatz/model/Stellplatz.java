@@ -41,19 +41,20 @@ public class Stellplatz {
 		return firstItem;
 	}
 
-	public void addDate(Date datum, String name) {
+	public void addDate(Date datum, String name, String zusatzInfos) {
 		// erstes Element der Liste
 		if (firstItem == null) {
-			firstItem = new DateItem(datum, name);
+			firstItem = new DateItem(datum, name, zusatzInfos);
 			lastItem = firstItem;
 
 		} else {
 			System.out.println("Datum: "+datum);
 			System.out.println("FirstItem: "+firstItem.getDate());
 			System.out.println("LastItem: "+lastItem.getDate());
-			// neues Datum hinter dem bisherigen letzten
-			if (lastItem.getDate().before(datum)) {
-				lastItem.next = new DateItem(datum, name);
+			
+			// neues Datum hinter dem bisherigen letzten 
+			if (lastItem.getDate().before(datum) ) {                            
+				lastItem.next = new DateItem(datum, name, zusatzInfos);
 				lastItem = lastItem.next;
 				System.out.println("if " + lastItem.getDate());
 				return;
@@ -61,18 +62,19 @@ public class Stellplatz {
 				// neues Datum vor dem ersten
 			} else if (datum.before(firstItem.getDate())) {
 				DateItem tempItem = firstItem;
-				firstItem = new DateItem(datum, name);
+				firstItem = new DateItem(datum, name, zusatzInfos);
 				firstItem.next = tempItem;
 				System.out.println("---- TEST DATUM VOR ERSTEN -----");
 
 			}
 			DateItem currentItem = firstItem;
+			System.out.println("CurrentItem: "+currentItem.getDate());
 			while (currentItem.next != null) {
 				System.out.println("Ja hier bin ich");
 				// neues Datum nach dem Ersten und vor dem n�chsten
 				if (currentItem.getDate().before(datum)
 						&& currentItem.next.getDate().after(datum)) {
-					DateItem newDate = new DateItem(datum, name);
+					DateItem newDate = new DateItem(datum, name, zusatzInfos);
 					newDate.next = currentItem.next;
 					currentItem.next = newDate;
 					System.out.println("test--1");					/*NEU*/
@@ -138,7 +140,7 @@ public class Stellplatz {
 			}
 				
 			if (currentItem.next == null && currentItem.getDate().before(datum)){
-				
+				System.out.println("im if drin");
 				return -1;
 			}
 				
@@ -203,10 +205,12 @@ public class Stellplatz {
 		public DateItem previous = null;
 		private Date value = null;
 		private String name;
+		private String zusatzInfos;
 
-		public DateItem(Date value, String name) {
+		public DateItem(Date value, String name, String zusatzInfos) {
 			this.value = value;
 			this.name = name;
+			this.zusatzInfos = zusatzInfos;
 		}
 
 		public Date getDate() {
@@ -215,6 +219,14 @@ public class Stellplatz {
 
 		public String getName() {
 			return this.name;
+		}
+		
+		public String getZusatzInfos() {
+			return zusatzInfos;
+		}
+
+		public void setZusatzInfos(String zusatzInfos) {
+			this.zusatzInfos = zusatzInfos;
 		}
 
 		@Override
@@ -248,7 +260,6 @@ public class Stellplatz {
 		private Stellplatz getOuterType() {
 			return Stellplatz.this;
 		}
-		
 		
 	}
 

@@ -65,6 +65,8 @@ public class MainFrame {
 	private String chosenXml = "";
 	private File dataFolder;
 	private JLabel lblProtocol;
+	
+	Calendar cal = new GregorianCalendar(); // new
 
 	public static DefaultTableModel dtm; // V1.1 SOSE 2014 - Neu für Oberfläche
 
@@ -77,10 +79,16 @@ public class MainFrame {
 			// nur
 			// April - September
 	};
+	private String[] jahre = new String[20];
+	
+	private String[] tage = new String[31];
 
 	private final String[] stellplaetze = { "1", "2", "3", "4", "5", "6", "7", // WS
 																				// 14/15       //Default-Einstellung
 			"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
+	
+	String[] columnName = new String[184];
+	public static String myDate = "";
 	
 	/**
 	 * Launch the application.
@@ -107,6 +115,9 @@ public class MainFrame {
 	public MainFrame() {
 		initialize();
 //		resetOberflaeche(); /* WS14/15 - löscht alle Einträge nach Neustart */
+		if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+			initializeOberflaeche();
+		}
 
 	}
 
@@ -185,18 +196,31 @@ public class MainFrame {
 
 		// Sebi: Kalender auf aktuelles Datum setzten - wird nicht benötigt für
 		// belegungsplan
-		Calendar cal = new GregorianCalendar(); // new
-
 		if (cal.get(Calendar.MONTH) < 4) {
-			cal.set(cal.get(Calendar.YEAR), 4, 1);
+			cal.set(cal.get(Calendar.YEAR), 3, 1);
 
 		}
 		if (cal.get(Calendar.MONTH) > 9) {
-			cal.set(cal.get(Calendar.YEAR) + 1, 4, 1);
+			cal.set(cal.get(Calendar.YEAR) + 1, 3, 1);
 
 		} else {
 
 			cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+		}
+		
+		//Lara fuer die Anzeige der richtigen Jahre beim Buchen und Loeschen
+		for(int i = 0; i < jahre.length;i++){
+			if(i==0){
+				jahre[0] = String.valueOf(cal.get(Calendar.YEAR));
+			}else{
+				jahre[i] = String.valueOf(cal.get(Calendar.YEAR)+i);
+			}
+		}
+		
+		//Lara fuer die Anzeige der richtigen Tage beim Buchen und loeschen
+		int laenge = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+		for(int i = 0; i < laenge;i++){
+				tage[i] = String.valueOf(i+1);
 		}
 
 		// 1.Buchen
@@ -208,7 +232,7 @@ public class MainFrame {
 
 		// Wie heisst der neue Gast
 		JLabel txtpnWieHeitDer = new JLabel();
-		txtpnWieHeitDer.setBounds(10, 6, 198, 20);
+		txtpnWieHeitDer.setBounds(10, 6, 190, 20);
 		txtpnWieHeitDer.setText("Wie hei\u00DFt der neue Gast?");
 		panelBuchen.add(txtpnWieHeitDer);
 
@@ -225,31 +249,39 @@ public class MainFrame {
 
 		// Tag des Monats
 		final JComboBox comboBox_tag = new JComboBox();
-		comboBox_tag.setModel(new DefaultComboBoxModel(
-				new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
-						"17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
+		comboBox_tag.setModel(new DefaultComboBoxModel(tage));
 		comboBox_tag.setBounds(236, 49, 70, 25);
 		// Sebi aktueller tag des Monats sofern innerhalb von April-September
 		comboBox_tag.setSelectedIndex(cal.get(Calendar.DAY_OF_MONTH) - 1);
 		panelBuchen.add(comboBox_tag);
-
 
 		// Monat
 		final JComboBox comboBox_monat = new JComboBox();
 		comboBox_monat.setModel(new DefaultComboBoxModel(months));
 		comboBox_monat.setBounds(300, 49, 120, 25);
 		// Sebi aktueller Monat, da Array nur aus 6 Monaten besteht, und April =
-		// 1 daher -4
-		comboBox_monat.setSelectedIndex(cal.get(Calendar.MONTH) - 4);
+		// 3 daher -3
+		comboBox_monat.setSelectedIndex(cal.get(Calendar.MONTH) - 3);
 		panelBuchen.add(comboBox_monat);
+		comboBox_monat.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				cal.set(Calendar.MONTH, comboBox_monat.getSelectedIndex()+3);
+				int laenge = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+				tage[30] = null;
+				for(int i = 0; i < laenge;i++){
+						tage[i] = String.valueOf(i+1);
+				}
+				comboBox_tag.setModel(new DefaultComboBoxModel(tage));
+			}
+		});
+
 
 		// Jahr
 		final JComboBox comboBox_jahr = new JComboBox();
-		comboBox_jahr.setModel(new DefaultComboBoxModel(new String[] { "2014", "2015", "2016", "2017", "2018", "2019",
-				"2020", "2021", "2022", "2023", "2024", "2025" }));
+		comboBox_jahr.setModel(new DefaultComboBoxModel(jahre));
 		comboBox_jahr.setBounds(415, 49, 100, 25);
 		// Sebi aktuelles Jahr
-		comboBox_jahr.setSelectedIndex(cal.get(Calendar.YEAR) - 2014);
+		comboBox_jahr.setSelectedIndex(0);
 		panelBuchen.add(comboBox_jahr);
 
 		// Wie lange bleibt der Gast
@@ -259,15 +291,13 @@ public class MainFrame {
 		panelBuchen.add(txtpnWieLangeBleibt);
 
 		// Dauer des Aufenthalts
-		final JComboBox comboBox_dauer = new JComboBox();
-		comboBox_dauer.setModel(new DefaultComboBoxModel(
-				new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
-						"17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
-		comboBox_dauer.setBounds(236, 91, 70, 25);
-		panelBuchen.add(comboBox_dauer);
+		JTextField dauerBuchen = new JTextField();
+		dauerBuchen.setBounds(236, 91, 68, 30);
+		dauerBuchen.setHorizontalAlignment(JTextField.CENTER);
+		panelBuchen.add(dauerBuchen);
 
 		JLabel lblTage = new JLabel("Tag(e)");
-		lblTage.setBounds(315, 94, 45, 16);
+		lblTage.setBounds(310, 98, 40, 16);
 		panelBuchen.add(lblTage);
 
 		// Auf welchem Stellplaty soll gebucht werden
@@ -276,15 +306,23 @@ public class MainFrame {
 		lblWelcherStellplatz.setBounds(10, 140, 280, 32);
 		lblWelcherStellplatz.setText("<html>Auf welchem Stellplatz soll<br> gebucht werden?");
 		panelBuchen.add(lblWelcherStellplatz);
+		
+		JLabel lblStellPlatzNr = new JLabel("Stellplatz Nr. :");
+		lblStellPlatzNr.setBounds(240, 140, 90, 15);
+		panelBuchen.add(lblStellPlatzNr); /* WiSe14/15 */
 
 		final JComboBox comboBox_StellPlatz = new JComboBox();
 		comboBox_StellPlatz.setModel(new DefaultComboBoxModel(stellplaetze));
-		comboBox_StellPlatz.setBounds(236, 135, 75, 25);
+		comboBox_StellPlatz.setBounds(343, 135, 75, 25);
 		panelBuchen.add(comboBox_StellPlatz);
-
-		JLabel lblStellPlatzNr = new JLabel("Stellplatz Nr.");
-		lblStellPlatzNr.setBounds(315, 140, 85, 15);
-		panelBuchen.add(lblStellPlatzNr); /* WiSe14/15 */
+		
+		JLabel zusatzInfos = new JLabel("Zusatzinformationen:");
+		zusatzInfos.setBounds(10, 190, 280, 30);
+		panelBuchen.add(zusatzInfos);
+		
+		JTextField zusatzInfosEingabe = new JTextField();
+		zusatzInfosEingabe.setBounds(236, 185, 183, 30);
+		panelBuchen.add(zusatzInfosEingabe);
 
 		// JLabel lblZulssigeberbuchungen = new JLabel( // WS14/15
 		// auskommentiert, da nicht benötigt
@@ -302,7 +340,7 @@ public class MainFrame {
 
 		// Button Buchen
 		JButton btnBuchen = new JButton("Buchen");
-		btnBuchen.setBounds(5, 252, 87, 28);
+		btnBuchen.setBounds(5, 240, 87, 28);
 		panelBuchen.add(btnBuchen);
 
 		// 2.Loeschen
@@ -319,23 +357,23 @@ public class MainFrame {
 		panelLoeschen.add(lblwelcherGastSoll);
 
 		txtField_name_del = new JTextField();
-		txtField_name_del.setBounds(240, 6, 179, 20);
+		txtField_name_del.setBounds(240, 6, 179, 30);
 		panelLoeschen.add(txtField_name_del);
 		txtField_name_del.setColumns(10);
 
 		// Auf welchem Stellplaty befindet sich der Gast
 		JLabel lblAufWelchemStellplatz = new JLabel("<html>Auf welchem Stellplatz befindet sich der Gast?");
 		lblAufWelchemStellplatz.setVerticalAlignment(SwingConstants.TOP);
-		lblAufWelchemStellplatz.setBounds(10, 52, 192, 32);
+		lblAufWelchemStellplatz.setBounds(10, 50, 192, 32);
 		panelLoeschen.add(lblAufWelchemStellplatz);
 
-		JLabel lblStellplatzNr = new JLabel("Stellplatz Nr:");
-		lblStellplatzNr.setBounds(240, 52, 85, 15);
+		JLabel lblStellplatzNr = new JLabel("Stellplatz Nr. :");
+		lblStellplatzNr.setBounds(240, 55, 90, 15);
 		panelLoeschen.add(lblStellplatzNr);
 
 		final JComboBox comboBox_sp = new JComboBox();
 		comboBox_sp.setModel(new DefaultComboBoxModel(stellplaetze));
-		comboBox_sp.setBounds(362, 49, 75, 25);
+		comboBox_sp.setBounds(348, 49, 75, 25);
 		panelLoeschen.add(comboBox_sp);
 
 		// Ab welchem Tag soll geloescht werden
@@ -346,9 +384,7 @@ public class MainFrame {
 		panelLoeschen.add(lblabWelchemTag);
 
 		final JComboBox comboBox_tag_del = new JComboBox();
-		comboBox_tag_del.setModel(new DefaultComboBoxModel(
-				new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
-						"17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
+		comboBox_tag_del.setModel(new DefaultComboBoxModel(tage));
 		comboBox_tag_del.setBounds(240, 90, 70, 25);
 		// Sebi aktueller tag des Monats sofern innerhalb von April-September
 		comboBox_tag_del.setSelectedIndex(cal.get(Calendar.DAY_OF_MONTH) - 1);
@@ -358,15 +394,25 @@ public class MainFrame {
 		comboBox_monat_del.setModel(new DefaultComboBoxModel(months));
 		comboBox_monat_del.setBounds(305, 90, 120, 25);
 		// Sebi aktueller Monat sofern innerhalb von April-September
-		comboBox_monat_del.setSelectedIndex(cal.get(Calendar.MONTH) - 4);
+		comboBox_monat_del.setSelectedIndex(cal.get(Calendar.MONTH) - 3);
 		panelLoeschen.add(comboBox_monat_del);
+		comboBox_monat_del.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				cal.set(Calendar.MONTH, comboBox_monat_del.getSelectedIndex()+3);
+				int laenge = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+				tage[30] = null;
+				for(int i = 0; i < laenge;i++){
+						tage[i] = String.valueOf(i+1);
+				}
+				comboBox_tag_del.setModel(new DefaultComboBoxModel(tage));
+			}
+		});
 
 		final JComboBox comboBox_jahr_del = new JComboBox();
-		comboBox_jahr_del.setModel(new DefaultComboBoxModel(new String[] { "2014", "2015", "2016", "2017", "2018",
-				"2019", "2020", "2021", "2022", "2023", "2024", "2025" }));
+		comboBox_jahr_del.setModel(new DefaultComboBoxModel(jahre));
 		comboBox_jahr_del.setBounds(420, 90, 100, 25);
 		// Sebi aktuelles jahr
-		comboBox_jahr_del.setSelectedIndex(cal.get(Calendar.YEAR) - 2014);
+		comboBox_jahr_del.setSelectedIndex(0);
 		panelLoeschen.add(comboBox_jahr_del);
 
 		// Fuer wie viele Tage soll geloescht werden
@@ -375,13 +421,18 @@ public class MainFrame {
 		lblfrWieViele.setBounds(10, 135, 192, 32);
 		lblfrWieViele.setText("<html>F\u00FCr wie viele Tage soll gel\u00F6scht werden?");
 		panelLoeschen.add(lblfrWieViele);
+		
+		JTextField dauerLoeschen = new JTextField();
+		dauerLoeschen.setBounds(240, 132, 70, 25);
+		dauerLoeschen.setHorizontalAlignment(JTextField.CENTER);
+		panelLoeschen.add(dauerLoeschen);
 
-		final JComboBox comboBox_anzahl = new JComboBox();
-		comboBox_anzahl.setModel(new DefaultComboBoxModel(
-				new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
-						"17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
-		comboBox_anzahl.setBounds(240, 132, 70, 25);
-		panelLoeschen.add(comboBox_anzahl);
+//		final JComboBox comboBox_anzahl = new JComboBox();
+//		comboBox_anzahl.setModel(new DefaultComboBoxModel(
+//				new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
+//						"17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
+//		comboBox_anzahl.setBounds(240, 132, 70, 25);
+////		panelLoeschen.add(comboBox_anzahl);
 
 		JLabel label_3 = new JLabel("Tag(e)");
 		label_3.setBounds(315, 135, 50, 16);
@@ -389,7 +440,7 @@ public class MainFrame {
 
 		// Button Loeschen
 		JButton buttonDel = new JButton("L\u00F6schen");
-		buttonDel.setBounds(5, 190, 89, 25);
+		buttonDel.setBounds(5, 200, 89, 25);
 		panelLoeschen.add(buttonDel);
 
 		// 3.Excel
@@ -492,14 +543,6 @@ public class MainFrame {
 		txtpnjahr.setBounds(10, 11, 205, 34);
 		panelBelegungsplan.add(txtpnjahr);
 
-		String[][] tableContent = new String[21][183];// SoSe 2014 - auf 184
-														// //Lara auf 183 Tage
-														// geändert, sonst
-														// Anzeige von 1.10.
-														// dabei
-														// days geändert, da
-														// September 30 Tage
-
 		// Sebi: combobox einfügen für auswahl des jahres
 		final JComboBox<Integer> comboBoxYear2 = new JComboBox<Integer>();
 		// comboBoxYear2.setModel(new DefaultComboBoxModel<Integer>());
@@ -522,19 +565,35 @@ public class MainFrame {
 		GregorianCalendar last = new GregorianCalendar((int) comboBoxYear2.getSelectedItem(),
 				GregorianCalendar.SEPTEMBER, 30);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
+		
+		String[][] tableContent = new String[184][40];// SoSe 2014 - auf 184 days geändert, da September 30 Tage
+		//Lara auf 183 Tage geändert, sonst Anzeige von 1.10. dabei
 
-		String[] columnName = { "Datum", "Platz1", "Platz2", "Platz3", "Platz4", "Platz5", "Platz6", "Platz7", "Platz8",
-				"Platz9", "Platz10", "Platz11", "Platz12", "Platz13", "Platz14", "Platz15", "Platz16", "Platz17",
-				"Platz18", "Platz19", "Platz20" };
-
-		dtm = new DefaultTableModel(tableContent, columnName.length);
-		dtm.setColumnIdentifiers(columnName);
-		dtm.setRowCount(tableContent[0].length);
-
+		String[] rowName = new String[40];
+		
+		columnName[0] = "Stellplatz";
 		// Sebi: Tag +1 für Tabelle im Tool
-		for (int i = 0; i < tableContent[0].length; i++) {
-			dtm.setValueAt(sdf.format(first.getTime()), i, 0);
+		for (int i = 1; i < columnName.length; i++) {
+			columnName[i] = sdf.format(first.getTime());
 			first.add(Calendar.DAY_OF_MONTH, 1);
+		}
+
+		dtm = new DefaultTableModel(columnName, rowName.length);
+//		dtm.setColumnIdentifiers(rowName);
+//		dtm.setRowCount(tableContent[0].length);
+		
+		int subtrahend = 0;
+		for (int i = 0; i < rowName.length; i++) {
+			if(i==0){
+				dtm.setValueAt((i+1), i, 0);	
+			}else{
+				if(i%2==0){
+					dtm.setValueAt(i-subtrahend, i, 0);
+					subtrahend++;
+				}else{
+					dtm.setValueAt(" ", i, 0);
+				}
+			}
 		}
 		// Sebi: sagt unnötig
 		// first.set(2015, 3, 1);
@@ -548,9 +607,9 @@ public class MainFrame {
 		table.setVisible(true);// SoSe 2014 - added
 		table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
 		TableColumnModel tcm = table.getColumnModel();
-		tcm.getColumn(0).setPreferredWidth(90);
+//		tcm.getColumn(0).setPreferredWidth(90);
 
-		// um erste Spalte mit Datum zu fixieren beim horizontalem Scrollen
+		// um erste Spalte mit Stellplatz zu fixieren beim horizontalem Scrollen
 		JTable fixed = new JTable();
 		fixed.setAutoCreateColumnsFromModel(false);
 		fixed.setModel(table.getModel());
@@ -588,22 +647,10 @@ public class MainFrame {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-
-				// Tabelle löschen
-				panelBelegungsplan.remove(scrollVert);
-				panelBelegungsplan.remove(btnPanel);
 				
 //				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
-				for(int i = 0; i < tableContent[0].length; i++){
-					System.out.println("Zeile "+i);
-					for(int j = 1; j < cp.getAnzahlStellplaetze()+1;j++){
-						System.out.println("Spalte "+j);
-						if(dtm.getValueAt(i, j) != null){
-							System.out.println("null");
-							dtm.setValueAt(null, i, j);
-						}
-						System.out.println("nicht null");
-					}	
+				if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+					resetOberflaeche();
 				}
 				
 				// first richtig setzten als selektierte jahreszahl
@@ -611,13 +658,27 @@ public class MainFrame {
 																					// "2014"
 						GregorianCalendar.APRIL, 1);
 				// Tabelle befüllen
-				for (int i = 0; i < tableContent[0].length; i++) {
-					dtm.setValueAt(sdf.format(first.getTime()), i, 0);
+				for (int i = 1; i < columnName.length; i++) {
+					columnName[i] = sdf.format(first.getTime());
 					first.add(Calendar.DAY_OF_MONTH, 1);
 				}
-				// Tabelle Panel hinzufügen
-				panelBelegungsplan.add(scrollVert, BorderLayout.SOUTH);
-				panelBelegungsplan.add(btnPanel, BorderLayout.NORTH);
+				dtm.setColumnIdentifiers(columnName);
+				
+				// um erste Spalte mit Stellplatz zu fixieren beim horizontalem Scrollen
+				JTable fixed = new JTable();
+				fixed.setAutoCreateColumnsFromModel(false);
+				fixed.setModel(table.getModel());
+				fixed.setSelectionModel(table.getSelectionModel());
+				fixed.setEnabled(false);
+				TableColumnModel columnModel = table.getColumnModel();
+				TableColumn coulumn = columnModel.getColumn(0);
+				columnModel.removeColumn(coulumn);
+				fixed.getColumnModel().addColumn(coulumn);
+				fixed.setPreferredScrollableViewportSize(fixed.getPreferredSize());
+				fixed.getColumnModel().getColumn(0).setResizable(false);
+				fixed.setGridColor(Color.LIGHT_GRAY);
+				scrollVert.setRowHeaderView(fixed);
+				scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
 				
 				//Lara Belegungsplan richtig anzeigen für spezielles Jahr
 				if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
@@ -642,8 +703,12 @@ public class MainFrame {
 
 		JTextField eingabeSp = new JTextField();
 		eingabeSp.setBounds(170, 10, 50, 20);
-		eingabeSp.setToolTipText("Zahl eingeben und best\u00E4tigen");
+		eingabeSp.setToolTipText("Zahl eingeben");
 		panelEinstellungen.add(eingabeSp);
+		
+		JButton ausfuehrenSp = new JButton("\u00dcbernehmen");
+		ausfuehrenSp.setBounds(260, 10, 110, 25);
+		panelEinstellungen.add(ausfuehrenSp);
 
 		// Belegungsdatei einlesen
 		JLabel belegdateiHochladen = new JLabel("Belegungsdatei einlesen:");
@@ -798,43 +863,41 @@ public class MainFrame {
 		// Ereignisverarbeitung
 
 		// Lara ActionListener für Anzahl Stellplätze verändern
-		eingabeSp.addActionListener(new ActionListener() {
+		ausfuehrenSp.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
 				if (eingabeSp.getText() != "") {
 					int anzahlStellplaetze = Integer.parseInt(eingabeSp.getText());
-					System.out.println(anzahlStellplaetze);
 					cp.setAnzahlStellplaetze(anzahlStellplaetze);
 					cp.aendereAnzahlStellplaetze(anzahlStellplaetze);
-
-					System.out.println(cp.getAnzahlStellplaetze());
+					
 					String[] neueStellplaetze = new String[anzahlStellplaetze];
 					for (int i = 0; i < cp.getAnzahlStellplaetze(); i++) {
 						neueStellplaetze[i] = String.valueOf(i + 1);
 					}
-					String[] neueStellplaetzeFuerBelegungsplan = new String[anzahlStellplaetze + 1];
-					neueStellplaetzeFuerBelegungsplan[0] = "Datum";
-					for (int i = 1; i < cp.getAnzahlStellplaetze() + 1; i++) {
-						neueStellplaetzeFuerBelegungsplan[i] = "Stellplatz" + String.valueOf(i);
+				
+					String[] neueStellplaetzeFuerBelegungsplan = new String[anzahlStellplaetze*2];
+					dtm.setRowCount(neueStellplaetzeFuerBelegungsplan.length);
+					int subtrahend = 0;
+					for (int i = 0; i < neueStellplaetzeFuerBelegungsplan.length; i++) {
+						if(i==0){
+							dtm.setValueAt((i+1), i, 0);	
+						}else{
+							if(i%2==0){
+								dtm.setValueAt(i-subtrahend, i, 0);
+								subtrahend++;
+							}else{
+								dtm.setValueAt(" ", i, 0);
+							}
+						}
 					}
 					comboBox_StellPlatz.setModel(new DefaultComboBoxModel(neueStellplaetze));
 					comboBox_sp.setModel(new DefaultComboBoxModel(neueStellplaetze));
-					dtm.setColumnIdentifiers(neueStellplaetzeFuerBelegungsplan);
+					
+					if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+						initializeOberflaeche();
+					}
 
-					JTable fixed = new JTable();
-					fixed.setAutoCreateColumnsFromModel(false);
-					fixed.setModel(table.getModel());
-					fixed.setSelectionModel(table.getSelectionModel());
-					fixed.setEnabled(false);
-					TableColumnModel columnModel = table.getColumnModel();
-					TableColumn coulumn = columnModel.getColumn(0);
-					columnModel.removeColumn(coulumn);
-					fixed.getColumnModel().addColumn(coulumn);
-					fixed.setPreferredScrollableViewportSize(fixed.getPreferredSize());
-					fixed.getColumnModel().getColumn(0).setResizable(false);
-					fixed.setGridColor(Color.LIGHT_GRAY);
-					scrollVert.setRowHeaderView(fixed);
-					scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
 				}
 
 			}
@@ -846,7 +909,6 @@ public class MainFrame {
 			public void actionPerformed(ActionEvent arg0) {
 
 				int limit = comboBox_over.getSelectedIndex();
-				String myDate = "";
 
 				if (txtField_name.getText().equalsIgnoreCase("")) {
 					JOptionPane.showMessageDialog(null, "Sie müssen einen Namen angeben!");
@@ -882,10 +944,9 @@ public class MainFrame {
 
 				boolean checker = cp.checkAvailability(
 						DateUtil.getInstance() // WS 14/15
-
 								.formatString(myDate),
-						(comboBox_dauer.getSelectedIndex() + 1), limit, txtField_name.getText(),
-						comboBox_StellPlatz.getSelectedIndex());
+						(Integer.parseInt(dauerBuchen.getText())), limit, txtField_name.getText(),
+						comboBox_StellPlatz.getSelectedIndex(), zusatzInfosEingabe.getText());
 
 				if (checker == false) { // wenn Stellplatz belegt ist
 
@@ -895,8 +956,8 @@ public class MainFrame {
 					JOptionPane.showMessageDialog(null, "<html>Überbuchungen überprüfen und von Hand eintragen.");
 
 					cp.checkAvailability(DateUtil.getInstance().formatString(myDate),
-							(comboBox_dauer.getSelectedIndex() + 1), limit, txtField_name.getText(),
-							comboBox_StellPlatz.getSelectedIndex());
+							(Integer.parseInt(dauerBuchen.getText())), limit, txtField_name.getText(),
+							comboBox_StellPlatz.getSelectedIndex(),zusatzInfosEingabe.getText());
 
 					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 					initializeOberflaeche(); // WS 14/15
@@ -904,8 +965,8 @@ public class MainFrame {
 				} else { // checker = true (Platz ist frei)
 
 					cp.checkAvailability(DateUtil.getInstance().formatString(myDate),
-							(comboBox_dauer.getSelectedIndex() + 1), limit, txtField_name.getText(), comboBox_StellPlatz
-									.getSelectedIndex()); /* WiSe14/15 */
+							(Integer.parseInt(dauerBuchen.getText())), limit, txtField_name.getText(), comboBox_StellPlatz
+									.getSelectedIndex(), zusatzInfosEingabe.getText()); /* WiSe14/15 */
 
 					JOptionPane.showMessageDialog(null,
 							"<html>Buchung erfolgreich!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
@@ -938,7 +999,7 @@ public class MainFrame {
 		// button 'LOESCHEN'
 		buttonDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int dauer = comboBox_anzahl.getSelectedIndex() + 1;
+				int dauer = Integer.parseInt(dauerLoeschen.getText());
 				int platz = comboBox_sp.getSelectedIndex() + 1;
 
 				String myDate = "";
@@ -998,8 +1059,10 @@ public class MainFrame {
 								+ " für die angegebene Dauer von " + dauer
 								+ " Tag(en) gelöscht!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
 						cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
-						readXml(dataFolder.getAbsolutePath() + "\\Belegungen.xml");
-						removeFromOberflaeche(txtField_name_del.getText(), platz, myDate, dauer);
+						resetOberflaeche();
+						initializeOberflaeche();
+//						readXml(dataFolder.getAbsolutePath() + "\\Belegungen.xml");
+//						removeFromOberflaeche(txtField_name_del.getText(), platz, myDate, dauer);
 
 					}
 					if (checkRemove < dauer) {
@@ -1009,10 +1072,10 @@ public class MainFrame {
 								+ " entfernt, jedoch nicht für die angegebene Dauer von " + dauer
 								+ " Tag(en). Bitte überprüfen Sie den Belegungsplan!<br>Um die änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
 						cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+						resetOberflaeche();
 						initializeOberflaeche();
 
 					}
-					initializeOberflaeche();
 				} else {
 					JOptionPane.showMessageDialog(null,
 							"Es wurde kein passender Eintrag gefunden! Bitte überprüfen Sie Ihre Angaben!");
@@ -1023,31 +1086,33 @@ public class MainFrame {
 		});
 		buttonDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				cp.xmlToBelegung(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+				cp.xmlToBelegung(dataFolder.getAbsolutePath() + "/Belegungen.xml", columnName[1]);
 			}
 		});
-		
-		if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
-			initializeOberflaeche();
-		}
 	}
 
 	private void initializeOberflaeche() {
-		cp.xmlToBelegung(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+		cp.xmlToBelegung(dataFolder.getAbsolutePath() + "/Belegungen.xml", columnName[1]);
 	}
 
-	private void resetOberflaeche() {
-		for (int i = 1; i < 21; i++) {
-			for (int j = 0; j < 183; j++) {
-				dtm.setValueAt("", j, i);
-			}
+	private void resetOberflaeche() {    //				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
+		for(int i = 0; i < cp.getAnzahlStellplaetze(); i++){
+			System.out.println("Zeile "+i);
+			for(int j = 1; j < columnName.length;j++){
+				System.out.println("Spalte "+j);
+				if(dtm.getValueAt(i, j) != null){
+					System.out.println("null");
+					dtm.setValueAt(null, i, j);
+				}
+				System.out.println("nicht null");
+			}	
 		}
 	}
 
-	private void removeFromOberflaeche(String text, int platz, String myDate, int dauer) {
-		cp.removeFromOberflaeche(text, platz, myDate, dauer);
-
-	}
+//	private void removeFromOberflaeche(String text, int platz, String myDate, int dauer) {
+//		cp.removeFromOberflaeche(text, platz, myDate, dauer);
+//
+//	}
 
 	protected void readXml(String path) {
 		try {
@@ -1075,7 +1140,7 @@ public class MainFrame {
 							DateUtil.getInstance()
 									.formatString(eElement.getElementsByTagName("DatumVon").item(0).getTextContent()),
 							Integer.parseInt(eElement.getElementsByTagName("Dauer").item(0).getTextContent()),
-							eElement.getElementsByTagName("Name").item(0).getTextContent());
+							eElement.getElementsByTagName("Name").item(0).getTextContent(), eElement.getElementsByTagName("Zusatzinformationen").item(0).getTextContent());
 				}
 			}
 

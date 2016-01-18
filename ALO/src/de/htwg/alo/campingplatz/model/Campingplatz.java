@@ -35,30 +35,27 @@ public class Campingplatz {
 	}
 
 	public boolean checkAvailability(Date datum, int dauer, int limit,
-			String name) {
+			String name,String zusatzInfos) {
 		return currentCheck.checkAvailability(stellplaetze, datum, dauer,
-				limit, name);
+				limit, name, zusatzInfos);
 	}
 
-	public boolean checkAvailability(Date datum, int dauer, int limit, /*
-																		 * WiSe14/
-																		 * 15
-																		 */
-			String name, int stellplatzIndex) {
+	public boolean checkAvailability(Date datum, int dauer, int limit, //WiSe14/15
+			String name, int stellplatzIndex, String zusatzInfos) {
 		return currentCheck.checkAvailability(stellplaetze.get(stellplatzIndex),
-				datum, dauer, limit, name);
+				datum, dauer, limit, name, zusatzInfos);
 	}
 
 	public int checkAvailabilityTest(Date datum, int dauer, int limit,
-			String name) {
+			String name, String zusatzInfos) {
 		return currentCheck.checkAvailabilityTest(stellplaetze, datum, dauer,
-				limit, name);
+				limit, name, zusatzInfos);
 	}
 
 	public void belegeStellplatz(int stellplatzIndex, Date datum, int dauer,
-			String name) {
+			String name, String zusatzInfos) {
 		currentCheck.belegeStellplatz(stellplaetze, stellplatzIndex, datum,
-				dauer, name);
+				dauer, name, zusatzInfos);
 	}
 
 	public String[] getBelegungsPlan(String monat, int jahr,
@@ -81,8 +78,8 @@ public class Campingplatz {
 	}
 
 	// V1.1 SOSE 2014 - neu zur Ausgabe in die Oberfl�che
-	public void xmlToBelegung(String inPath) {
-		PersistenceXml.xmlToBelegung(this, inPath);
+	public void xmlToBelegung(String inPath, String calendarDatum) {
+		PersistenceXml.xmlToBelegung(this, inPath, calendarDatum);
 	}
 
 	public void printStatistic() {
@@ -94,7 +91,7 @@ public class Campingplatz {
 
 	// V1.1 SoSe 2014
 	public void belegeStellplatzAufGUI(int stellplatzIndex, Date datumVon,
-			int dauer, String name) {
+			int dauer, String name, String zusatzInfos, String calendarDatum) {
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(datumVon);
@@ -107,14 +104,17 @@ public class Campingplatz {
 //				GregorianCalendar.SEPTEMBER, 30);
 //		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
-		int col = stellplatzIndex + 1;// +1 da die erste Spalte f�r das Label Datum
-									// verwendet wird
-		int row = 0;
 		
+		int col = 1;// +1 da die erste Spalte f�r das Label Datum
+		int colZusatzInfos = col;							// verwendet wird
+		
+		int row = stellplatzIndex*2;
+		int rowZusatzInfos = (stellplatzIndex*2) + 1;
+
 //		long result = last.getTimeInMillis() - first.getTimeInMillis();
 //		result = result / (1000 * 60 * 60 * 24); // umrechnung in Tage
 //		int length = (int) result;
-		int length = 183;
+		int length = 184;
 		System.out.println(length);
 		
 		GregorianCalendar tempCal = new GregorianCalendar(jahr,
@@ -124,21 +124,30 @@ public class Campingplatz {
 		
 		for (int i = 0; i < length; i++) {
 			if (tempDate.equals(datumVon)) {
-				row = i;
+				col = col + i;
+				colZusatzInfos = col;
+				break;
 			}
-			tempCal.add(tempCal.DAY_OF_MONTH, 1);
+			tempCal.add(tempCal.DAY_OF_YEAR, 1);
 			tempDate = tempCal.getTime();
 		}
 
 		for (int j = 0; j < dauer; j++) {
-			String datumKalender = MainFrame.dtm.getValueAt(0, 0).toString();
+			if(stellplatzIndex > anzahlStellplaetze-1){
+				break;
+			}
+			String datumKalender = calendarDatum;
 			System.out.println(datumKalender);
 			String datumRichtig = sdf.format(first.getTime());
 			System.out.println(datumRichtig);
 			if(datumKalender.compareTo(datumRichtig)==0){
 				System.out.println("Geschafft");
 				MainFrame.dtm.setValueAt(name, row, col);
-				row++;
+				MainFrame.dtm.setValueAt(zusatzInfos, rowZusatzInfos, colZusatzInfos);
+				col++;
+				if(col >= length){
+					break;
+				}
 			}
 		}
 
@@ -155,24 +164,24 @@ public class Campingplatz {
 		}
 	}
 
-	public void removeFromOberflaeche(String text, int platz, String myDate,
-			int dauer) {
-
-		GregorianCalendar first = new GregorianCalendar(2014,
-				GregorianCalendar.APRIL, 1);
-		Date currentDate = null;
-		currentDate = DateUtil.getInstance().formatString(myDate);
-		long result = currentDate.getTime() - first.getTimeInMillis();
-		result = result / (1000 * 60 * 60 * 24); // umrechnung in Tage
-
-		int col = platz;
-		int row = (int) result;
-
-		for (int i = 0; i < dauer + 1; i++) {
-			MainFrame.dtm.setValueAt("", row++, col);
-		}
-
-	}
+//	public void removeFromOberflaeche(String text, int platz, String myDate,
+//			int dauer) {
+//
+//		GregorianCalendar first = new GregorianCalendar(2014,
+//				GregorianCalendar.APRIL, 1);
+//		Date currentDate = null;
+//		currentDate = DateUtil.getInstance().formatString(myDate);
+//		long result = currentDate.getTime() - first.getTimeInMillis();
+//		result = result / (1000 * 60 * 60 * 24); // umrechnung in Tage
+//
+//		int col = platz;
+//		int row = (int) result;
+//
+//		for (int i = 0; i < dauer + 1; i++) {
+//			MainFrame.dtm.setValueAt("", row++, col);
+//		}
+//
+//	}
 	
 	public void aendereAnzahlStellplaetze(int anzahlStellplaetze){
 		if(stellplaetze.size() >= anzahlStellplaetze){

@@ -9,20 +9,20 @@ import de.htwg.alo.campingplatz.model.Stellplatz;
 public interface ICheckAvailability {
 
 	boolean checkAvailability(ArrayList<Stellplatz> stellplaetze, Date datum, int dauer,
-			int limit, String name);
+			int limit, String name, String zusatzInfos);
 
     boolean checkAvailability(Stellplatz stellplatz, Date datum, int dauer,			/* WiSe14/15 */
-    								int limit, String name);
+    								int limit, String name, String zusatzInfos);
 
 	int checkAvailabilityTest(ArrayList<Stellplatz> stellplaetze, Date datum, int dauer,
-			int limit, String name);
+			int limit, String name, String zusatzInfos);
 
 
 	void belegeStellplatz(ArrayList<Stellplatz> stellplaetze, int stellplatzIndex,
-			Date datum, int dauer, String name);
+			Date datum, int dauer, String name, String zusatzInfos);
 
 	 void belegeStellplatz(Stellplatz stellplatz,										/* WiSe14/15 */
-                          Date datum, int dauer, String name);
+                          Date datum, int dauer, String name, String zusatzInfos);
 
 	String[] getBelegungsPlan(ArrayList<Stellplatz> stellplaetze, int stellplatzNummer,
 			String monat, int jahr);

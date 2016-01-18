@@ -20,6 +20,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.Calendar;
+
 public class PersistenceXml {
 	public static void belegungenToXml(ArrayList<Stellplatz> stellplaetze, String outPath) {
 
@@ -36,6 +38,7 @@ public class PersistenceXml {
 
 			Stellplatz.DateItem currItem = stellplatz.getBelegungen();
 			while (currItem != null) {
+				System.out.println("CurrItem fuer Xml: " + DateUtil.getInstance().formatDate(currItem.getDate()));
 				Stellplatz.DateItem myFirstItem = currItem;
 				sb.append("<Belegung>");
 				sb.append("<Stellplatz>" + stellplatzNr + "</Stellplatz>");
@@ -44,13 +47,30 @@ public class PersistenceXml {
 						+ "</DatumVon>");
 				int dauer = 1;
 				String name = currItem.getName();
+				String zusatzInfos = currItem.getZusatzInfos();
+				Calendar calCurrItem = Calendar.getInstance();
+				calCurrItem.setTime(currItem.getDate());
+				int tagCurrItem = calCurrItem.get(Calendar.DAY_OF_YEAR);
+				System.out.println(tagCurrItem);
+				Calendar calCurrItemNext = Calendar.getInstance();
+	
 				while ((currItem.next != null)
 						&& (currItem.next.getName().equals(currItem.getName()))) {
-					dauer++;
-					currItem = currItem.next;
+					calCurrItemNext.setTime(currItem.next.getDate());
+					int tagCurrItemNext = calCurrItemNext.get(Calendar.DAY_OF_YEAR);
+					System.out.println(tagCurrItemNext);
+					if(tagCurrItemNext-tagCurrItem == 1){
+						dauer++;
+						currItem = currItem.next;
+						calCurrItem.setTime(currItem.getDate());
+						tagCurrItem = calCurrItem.get(Calendar.DAY_OF_YEAR);
+					}else{
+						break;
+					}
 				}
 				sb.append("<Dauer>" + dauer + "</Dauer>");
 				sb.append("<Name>" + name + "</Name>");
+				sb.append("<Zusatzinformationen>" + zusatzInfos + "</Zusatzinformationen>");
 				sb.append("</Belegung>");
 				
 				currItem = currItem.next;
@@ -73,14 +93,14 @@ public class PersistenceXml {
 		}
 	}
 	//1.1 SOSE14 Neu
-	public static void xmlToBelegung(Campingplatz cp, String inPath) {
+	public static void xmlToBelegung(Campingplatz cp, String inPath, String calendarDatum) {
 		
 		//logik
-		readXmlForGUI(cp, inPath); 
+		readXmlForGUI(cp, inPath, calendarDatum); 
 	
 		
 	}
-	protected static void readXmlForGUI(Campingplatz cp, String path) {//V1.1 SoSe 2014
+	protected static void readXmlForGUI(Campingplatz cp, String path, String calendarDatum) {//V1.1 SoSe 2014
 		try {
 
 			File fXmlFile = new File(path);
@@ -126,7 +146,9 @@ public class PersistenceXml {
 											.getElementsByTagName("Dauer")
 											.item(0).getTextContent()),
 							eElement.getElementsByTagName("Name").item(0)
-									.getTextContent());
+									.getTextContent(), 
+									eElement.getElementsByTagName("Zusatzinformationen").item(0).getTextContent(),
+									calendarDatum);
 					
 				}
 			}
