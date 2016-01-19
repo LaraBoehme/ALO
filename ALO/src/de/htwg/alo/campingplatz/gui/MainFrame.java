@@ -59,6 +59,7 @@ public class MainFrame {
 
 	int anzahlStellplaetze = 20; // Default-Einstellung
 	Campingplatz cp = new Campingplatz(anzahlStellplaetze, new CheckAvailabilitySimple());
+	
 	private JFrame frmCampingplatzVerwaltung;
 	private JTextField txtField_name;
 	private JTextField txtField_name_del;
@@ -79,15 +80,13 @@ public class MainFrame {
 			// nur
 			// April - September
 	};
-	private String[] jahre = new String[20];
-	
-	private String[] tage = new String[31];
 
 	private final String[] stellplaetze = { "1", "2", "3", "4", "5", "6", "7", // WS
 																				// 14/15       //Default-Einstellung
 			"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
 	
-	String[] columnName = new String[184];
+	String[] columnName = new String[184];  // um die Spalten der Belegungsplan-Anzeige zu füllen
+	
 	public static String myDate = "";
 	
 	/**
@@ -114,7 +113,6 @@ public class MainFrame {
 	 */
 	public MainFrame() {
 		initialize();
-//		resetOberflaeche(); /* WS14/15 - löscht alle Einträge nach Neustart */
 		if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
 			initializeOberflaeche();
 		}
@@ -133,7 +131,7 @@ public class MainFrame {
 		// wird oder erstellt wird
 		// lblProtocol = new JLabel("");
 		lblProtocol = new JLabel();
-		lblProtocol.setBounds(10, 800, 250, 20);
+		lblProtocol.setBounds(10, 780, 250, 20);
 
 		File jarFile = new File(MainFrame.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 
@@ -174,7 +172,7 @@ public class MainFrame {
 
 		// ****************************************************************************************************************************
 		frmCampingplatzVerwaltung.setLayout(new BorderLayout());
-		frmCampingplatzVerwaltung.setPreferredSize(new Dimension(1615, 750));// 1.1
+		frmCampingplatzVerwaltung.setPreferredSize(new Dimension(1615, 700));// 1.1
 																				// SOSE
 																				// 2014
 																				// -
@@ -207,26 +205,9 @@ public class MainFrame {
 
 			cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
 		}
-		
-		//Lara fuer die Anzeige der richtigen Jahre beim Buchen und Loeschen
-		for(int i = 0; i < jahre.length;i++){
-			if(i==0){
-				jahre[0] = String.valueOf(cal.get(Calendar.YEAR));
-			}else{
-				jahre[i] = String.valueOf(cal.get(Calendar.YEAR)+i);
-			}
-		}
-		
-		//Lara fuer die Anzeige der richtigen Tage beim Buchen und loeschen
-		int laenge = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-		for(int i = 0; i < laenge;i++){
-				tage[i] = String.valueOf(i+1);
-		}
 
 		// 1.Buchen
 		JPanel panelBuchen = new JPanel();
-		// Tab Buchen wird erstellt mit dem Panel Buchen und dem TabbedPane
-		// hinzugefuegt
 		tabbedPane.addTab("Buchen", null, panelBuchen, null);
 		panelBuchen.setLayout(null);
 
@@ -249,8 +230,11 @@ public class MainFrame {
 
 		// Tag des Monats
 		final JComboBox comboBox_tag = new JComboBox();
-		comboBox_tag.setModel(new DefaultComboBoxModel(tage));
+		comboBox_tag.setModel(new DefaultComboBoxModel());
 		comboBox_tag.setBounds(236, 49, 70, 25);
+		for (int n = cal.getActualMinimum(Calendar.DAY_OF_MONTH); n <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); n++) {
+			comboBox_tag.addItem(n);
+		}
 		// Sebi aktueller tag des Monats sofern innerhalb von April-September
 		comboBox_tag.setSelectedIndex(cal.get(Calendar.DAY_OF_MONTH) - 1);
 		panelBuchen.add(comboBox_tag);
@@ -265,21 +249,21 @@ public class MainFrame {
 		panelBuchen.add(comboBox_monat);
 		comboBox_monat.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
+					comboBox_tag.removeAllItems();
 				cal.set(Calendar.MONTH, comboBox_monat.getSelectedIndex()+3);
-				int laenge = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-				tage[30] = null;
-				for(int i = 0; i < laenge;i++){
-						tage[i] = String.valueOf(i+1);
+				for (int n = cal.getActualMinimum(Calendar.DAY_OF_MONTH); n <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); n++) {
+					comboBox_tag.addItem(n);
 				}
-				comboBox_tag.setModel(new DefaultComboBoxModel(tage));
 			}
 		});
 
-
 		// Jahr
 		final JComboBox comboBox_jahr = new JComboBox();
-		comboBox_jahr.setModel(new DefaultComboBoxModel(jahre));
+		comboBox_jahr.setModel(new DefaultComboBoxModel());
 		comboBox_jahr.setBounds(415, 49, 100, 25);
+		for (int n = cal.get(Calendar.YEAR); n <= cal.get(Calendar.YEAR) + 10; n++) {
+			comboBox_jahr.addItem(n);
+		}
 		// Sebi aktuelles Jahr
 		comboBox_jahr.setSelectedIndex(0);
 		panelBuchen.add(comboBox_jahr);
@@ -300,7 +284,7 @@ public class MainFrame {
 		lblTage.setBounds(310, 98, 40, 16);
 		panelBuchen.add(lblTage);
 
-		// Auf welchem Stellplaty soll gebucht werden
+		// Auf welchem Stellplatz soll gebucht werden
 		JLabel lblWelcherStellplatz = new JLabel(); /* WiSe14/15 */
 		lblWelcherStellplatz.setVerticalAlignment(SwingConstants.TOP);
 		lblWelcherStellplatz.setBounds(10, 140, 280, 32);
@@ -316,6 +300,7 @@ public class MainFrame {
 		comboBox_StellPlatz.setBounds(343, 135, 75, 25);
 		panelBuchen.add(comboBox_StellPlatz);
 		
+		// Zusatzinformationen
 		JLabel zusatzInfos = new JLabel("Zusatzinformationen:");
 		zusatzInfos.setBounds(10, 190, 280, 30);
 		panelBuchen.add(zusatzInfos);
@@ -384,8 +369,11 @@ public class MainFrame {
 		panelLoeschen.add(lblabWelchemTag);
 
 		final JComboBox comboBox_tag_del = new JComboBox();
-		comboBox_tag_del.setModel(new DefaultComboBoxModel(tage));
+		comboBox_tag_del.setModel(new DefaultComboBoxModel());
 		comboBox_tag_del.setBounds(240, 90, 70, 25);
+		for (int n = cal.getActualMinimum(Calendar.DAY_OF_MONTH); n <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); n++) {
+			comboBox_tag_del.addItem(n);
+		}
 		// Sebi aktueller tag des Monats sofern innerhalb von April-September
 		comboBox_tag_del.setSelectedIndex(cal.get(Calendar.DAY_OF_MONTH) - 1);
 		panelLoeschen.add(comboBox_tag_del);
@@ -399,18 +387,19 @@ public class MainFrame {
 		comboBox_monat_del.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				cal.set(Calendar.MONTH, comboBox_monat_del.getSelectedIndex()+3);
-				int laenge = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-				tage[30] = null;
-				for(int i = 0; i < laenge;i++){
-						tage[i] = String.valueOf(i+1);
+				comboBox_tag_del.removeAllItems();
+				for (int n = cal.getActualMinimum(Calendar.DAY_OF_MONTH); n <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); n++) {
+					comboBox_tag_del.addItem(n);
 				}
-				comboBox_tag_del.setModel(new DefaultComboBoxModel(tage));
 			}
 		});
 
 		final JComboBox comboBox_jahr_del = new JComboBox();
-		comboBox_jahr_del.setModel(new DefaultComboBoxModel(jahre));
+		comboBox_jahr_del.setModel(new DefaultComboBoxModel());
 		comboBox_jahr_del.setBounds(420, 90, 100, 25);
+		for (int n = cal.get(Calendar.YEAR); n <= cal.get(Calendar.YEAR) + 10; n++) {
+			comboBox_jahr_del.addItem(n);
+		}
 		// Sebi aktuelles jahr
 		comboBox_jahr_del.setSelectedIndex(0);
 		panelLoeschen.add(comboBox_jahr_del);
@@ -426,13 +415,6 @@ public class MainFrame {
 		dauerLoeschen.setBounds(240, 132, 70, 25);
 		dauerLoeschen.setHorizontalAlignment(JTextField.CENTER);
 		panelLoeschen.add(dauerLoeschen);
-
-//		final JComboBox comboBox_anzahl = new JComboBox();
-//		comboBox_anzahl.setModel(new DefaultComboBoxModel(
-//				new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16",
-//						"17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
-//		comboBox_anzahl.setBounds(240, 132, 70, 25);
-////		panelLoeschen.add(comboBox_anzahl);
 
 		JLabel label_3 = new JLabel("Tag(e)");
 		label_3.setBounds(315, 135, 50, 16);
@@ -457,9 +439,9 @@ public class MainFrame {
 		final JComboBox comboBoxMonth = new JComboBox();
 		comboBoxMonth.setToolTipText("");
 		comboBoxMonth.setModel(new DefaultComboBoxModel(months));
-		comboBoxMonth.setBounds(300, 11, 120, 25);
+		comboBoxMonth.setBounds(280, 11, 120, 25);
 		// Sebi aktueller Monat sofern innerhalb von April-September
-		comboBoxMonth.setSelectedIndex(cal.get(Calendar.MONTH) - 4);
+		comboBoxMonth.setSelectedIndex(cal.get(Calendar.MONTH) - 3);
 		panelExcel.add(comboBoxMonth);
 
 		// Fuer welches Jahr soll ein Belegungsplan gedruckt werden
@@ -470,14 +452,13 @@ public class MainFrame {
 
 		final JComboBox comboBoxYear = new JComboBox();
 		comboBoxYear.setModel(new DefaultComboBoxModel());
-		for (int n = 2014; n <= 2025; n++) {
-
+		for (int n = cal.get(Calendar.YEAR) - 2; n <= cal.get(Calendar.YEAR) + 10; n++) {
 			comboBoxYear.addItem(n);
 		}
 		// comboBoxYear.setSelectedIndex(30);
 		comboBoxYear.setBounds(300, 56, 100, 25);
 		// Sebi aktuelles jahr
-		comboBoxYear.setSelectedIndex(cal.get(Calendar.YEAR) - 2014);
+		comboBoxYear.setSelectedIndex(cal.get(Calendar.YEAR) - (cal.get(Calendar.YEAR) - 2));
 		panelExcel.add(comboBoxYear);
 
 		// Wo soll der Belegunsplan gespeichert werden
@@ -485,18 +466,19 @@ public class MainFrame {
 		txtpnWoSollDie.setText("<html>Wo soll der Belegungsplan gespeichert werden?</html>");
 		txtpnWoSollDie.setBounds(10, 101, 205, 34);
 		panelExcel.add(txtpnWoSollDie);
+		
+		JButton btnNewButton_waehleSpeicherortBel = new JButton("Ausw\u00E4hlen");
+		btnNewButton_waehleSpeicherortBel.setBounds(290, 100, 110, 25);
+		panelExcel.add(btnNewButton_waehleSpeicherortBel);
+		
+		final JLabel lblSpeicherort = new JLabel("Speicherort:");
+		lblSpeicherort.setBounds(10, 146, 89, 14);
+		panelExcel.add(lblSpeicherort);
 
 		final JLabel textPane_speicherOrtBel = new JLabel();
 		textPane_speicherOrtBel.setBounds(141, 146, 278, 14);
 		panelExcel.add(textPane_speicherOrtBel);
 		textPane_speicherOrtBel.setBorder(LineBorder.createBlackLineBorder());
-		JButton btnNewButton_waehleSpeicherortBel = new JButton("Ausw\u00E4hlen");
-		btnNewButton_waehleSpeicherortBel.setBounds(300, 100, 110, 25);
-		panelExcel.add(btnNewButton_waehleSpeicherortBel);
-
-		final JLabel lblSpeicherort = new JLabel("Speicherort:");
-		lblSpeicherort.setBounds(10, 146, 89, 14);
-		panelExcel.add(lblSpeicherort);
 
 		// Button Erstellen Belegungsplan erstellen
 		JButton btnErstellen = new JButton("Erstellen");
@@ -547,13 +529,12 @@ public class MainFrame {
 		final JComboBox<Integer> comboBoxYear2 = new JComboBox<Integer>();
 		// comboBoxYear2.setModel(new DefaultComboBoxModel<Integer>());
 
-		for (int n = 2015; n <= 2025; n++) {
-
+		for (int n = cal.get(Calendar.YEAR) - 2; n <= cal.get(Calendar.YEAR) + 10; n++) {
 			comboBoxYear2.addItem(n);
 		}
 
 		// Sebi: wird nur einmal beim start aufgerufen, zeigt aktuelles jahr an
-		comboBoxYear2.setSelectedIndex(cal.get(Calendar.YEAR) - 2015);
+		comboBoxYear2.setSelectedIndex(cal.get(Calendar.YEAR) - (cal.get(Calendar.YEAR) - 2));
 		panelBelegungsplan.add(comboBoxYear2);
 
 		// Sebi: Start der tabelle festlegen

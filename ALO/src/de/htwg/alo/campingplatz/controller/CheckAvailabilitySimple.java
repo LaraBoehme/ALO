@@ -147,10 +147,10 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 		}
 	} /* WiSe14/15 */
 
-	public String[] getBelegungsPlan(ArrayList<Stellplatz> stellplaetze,
-			int stellplatzNummer, String monat, int jahr) {
-		String[] tempBelegung = stellplaetze.get(stellplatzNummer)
-				.getBelegungsPlanSP(monat, jahr, stellplatzNummer);
+	public ArrayList<String> getBelegungsPlan(ArrayList<Stellplatz> stellplaetze,
+			int stellplatzNummer, String monat, int jahr, int datenwahl) {
+		ArrayList<String> tempBelegung = stellplaetze.get(stellplatzNummer)
+				.getBelegungsPlanSP(monat, jahr, stellplatzNummer,datenwahl);
 		return tempBelegung;
 
 	}

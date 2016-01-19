@@ -1,5 +1,6 @@
 package de.htwg.alo.campingplatz.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -156,48 +157,58 @@ public class Stellplatz {
 		return 0;
 	}
 
-	public String[] getBelegungsPlanSP(String monat, int jahr,
-			int stellplatzNummer) {
-		String[] belegungen = new String[32];
+	public ArrayList<String> getBelegungsPlanSP(String monat, int jahr,
+			int stellplatzNummer, int datenwahl) {
+		ArrayList<String> belegungen = new ArrayList<String>();
+		ArrayList<String> zusatzInfos = new ArrayList<String>();
+		
 		GregorianCalendar gc = new GregorianCalendar(jahr,
-				(Integer.parseInt(monat) - 1), 01);
+					(Integer.parseInt(monat) - 1), 01);
 
-		int zaehler = 1;
-		belegungen[0] = "" + (stellplatzNummer + 1);
-		DateItem currentItem = firstItem;
-		while (currentItem != null) {
-			// If (�bergebener monat = monat der belegung)
-			String tempMonat = DateUtil.getInstance()
-					.formatDate(currentItem.getDate()).substring(3, 5);
-			if (tempMonat.equalsIgnoreCase(monat)) {
-
-				while (currentItem != null
-						&& gc.get(GregorianCalendar.MONTH) == Integer
-								.parseInt(monat) - 1) {
-					// Schreibe Wert, wenn gleiches Datum, ansonsten
-					// <placeholder>
-					if (DateUtil
-							.getInstance()
-							.formatDate(gc.getTime())
-							.equalsIgnoreCase(
-									DateUtil.getInstance().formatDate(
-											currentItem.getDate()))) {
-						belegungen[zaehler] = currentItem.getName();
-						gc.add(Calendar.DATE, 1);
-						zaehler++;
-						break;
-					} else {
-						belegungen[zaehler] = "";
+			belegungen.add("" + (stellplatzNummer + 1));
+			zusatzInfos.add("");
+			DateItem currentItem = firstItem;
+			DateItem pruefItem = new DateItem(gc.getTime(), "", "");
+			
+			while (gc.get(GregorianCalendar.MONTH) == Integer
+									.parseInt(monat) - 1){
+				
+				if(currentItem != null){		//wenn es überhaupt eine Buchung gibt
+					String tempMonat = DateUtil.getInstance()
+							.formatDate(currentItem.getDate()).substring(3, 5);
+					if(tempMonat.equalsIgnoreCase(monat)){      			// wenn der Buchungsmonat mit dem gewünschten Monat für die Excel-Tabelle übereinstimmt
+						if(DateUtil.getInstance().formatDate(gc.getTime()).
+								equalsIgnoreCase(DateUtil.getInstance().formatDate(currentItem.getDate()))){ //wenn die Daten gleich sind
+							belegungen.add(currentItem.getName());
+							if(pruefItem.getName()==currentItem.getName() && pruefItem.getZusatzInfos() == currentItem.getZusatzInfos()){
+								zusatzInfos.add("");
+							}else{
+								zusatzInfos.add(currentItem.getZusatzInfos());
+							}
+							pruefItem = currentItem;
+							currentItem = currentItem.next;
+						}else{
+							belegungen.add("");
+							zusatzInfos.add("");
+						}
+					}else{
+						belegungen.add("");
+						zusatzInfos.add("");
 					}
-					gc.add(Calendar.DATE, 1);
-					zaehler++;
+					
+				}else{
+					belegungen.add("");
+					zusatzInfos.add("");
 				}
-
+				
+				gc.add(Calendar.DATE, 1);
 			}
-			currentItem = currentItem.next;
-
+			if(datenwahl==1){
+				return belegungen;
+			}else{
+			return zusatzInfos;
 		}
-		return belegungen;
+		
 	}
 
 	public class DateItem {

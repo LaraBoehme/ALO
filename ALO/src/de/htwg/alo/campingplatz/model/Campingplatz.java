@@ -58,10 +58,10 @@ public class Campingplatz {
 				dauer, name, zusatzInfos);
 	}
 
-	public String[] getBelegungsPlan(String monat, int jahr,
-			int stellplatzNummer) {
+	public ArrayList<String> getBelegungsPlan(String monat, int jahr,
+			int stellplatzNummer, int datenwahl) {
 		return currentCheck.getBelegungsPlan(stellplaetze, stellplatzNummer,
-				monat, jahr);
+				monat, jahr, datenwahl);
 	}
 	
 	public Set<String> getAllBelegungen(String month) {										/* WiSe14/15 */

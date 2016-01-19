@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -24,14 +25,16 @@ import de.htwg.alo.campingplatz.model.Campingplatz;
 import de.htwg.alo.campingplatz.util.DateUtil;
 
 public class JavaToExcel {
-	public static final int anzahlStellplaetze = 20;
 
 	public void exportToExcel(int monat, int jahr, Campingplatz cp,
 			String speicherOrt) {
 
 		int stellplatzNummer = 0;
-		String[] myCalendar = new String[100];
-		String[] myBelegungen = new String[100];
+		ArrayList<String> kalender = new ArrayList<String>();
+		ArrayList<String> belegungen = new ArrayList<String>();
+		ArrayList<String> zusatzInfos = new ArrayList<String>();
+		ArrayList<String> leereZeileNachKopfzeile = new ArrayList<String>();
+		
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.set(jahr, (monat - 1), 01);
 		int currentMonth = gc.get(GregorianCalendar.MONTH);
@@ -41,7 +44,8 @@ public class JavaToExcel {
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		HSSFSheet sheet = workbook.createSheet(tempMonat);
 
-		Map<Integer, Object[]> data = new HashMap<Integer, Object[]>();
+		Map<Integer, ArrayList<String>> data = new HashMap<Integer, ArrayList<String>>();
+		Map<Integer, ArrayList<String>> infos = new HashMap<Integer, ArrayList<String>>();
 
 		String stringMonat = "";
 		switch (monat) {
@@ -77,11 +81,13 @@ public class JavaToExcel {
 		}
 
 		int zaehler = 1;
-		myCalendar[0] = "Stellplatz-NR:";
+		kalender.add("Stellplatz-Nr. :");
+		leereZeileNachKopfzeile.add("");
 
 		while (gc.get(GregorianCalendar.MONTH) == currentMonth) {
-			myCalendar[zaehler] = DateUtil.getInstance().formatDate(
-					gc.getTime());
+			kalender.add(DateUtil.getInstance().formatDate(
+					gc.getTime()));
+			leereZeileNachKopfzeile.add("");
 			zaehler++;
 
 			// Tag wird um 1 erh�ht
@@ -91,13 +97,15 @@ public class JavaToExcel {
 
 		// Alle Tage des Monats werden in die erste Zeile (Kopfzeile) der
 		// Excel-Datei geschrieben
-		data.put(1, myCalendar);
-
-		for (int i = 0; i < anzahlStellplaetze; i++) {
-			myBelegungen = cp.getBelegungsPlan(stringMonat, jahr,
-					stellplatzNummer);
-
-			data.put((i + 2), myBelegungen);
+		data.put(1, kalender);
+		infos.put(1, leereZeileNachKopfzeile);
+		
+		for (int i = 0; i < cp.getAnzahlStellplaetze(); i++) {
+			belegungen = cp.getBelegungsPlan(stringMonat, jahr,stellplatzNummer, 1);     // bei 1 holt er die namen der belegungen 
+			zusatzInfos = cp.getBelegungsPlan(stringMonat, jahr, stellplatzNummer, 2);
+			data.put((i + 2), belegungen);
+			infos.put((i+2), zusatzInfos);
+		
 
 			stellplatzNummer++;
 
@@ -107,8 +115,9 @@ public class JavaToExcel {
 		int rownum = 0;
 		for (Integer key : keyset) {
 			Row row = sheet.createRow(rownum++);
+			System.out.println("Ich bin Zeile "+ rownum);
 
-			Object[] objArr = data.get(key);
+			ArrayList<String> objArr = data.get(key);
 			int cellnum = 0;
 			for (Object obj : objArr) {
 				Cell cell = row.createCell(cellnum++);
@@ -117,17 +126,24 @@ public class JavaToExcel {
 				} else if (obj instanceof Integer) {
 					cell.setCellValue((Integer) obj);
 				}
-				
 				HSSFCellStyle style = workbook.createCellStyle();						// *NEU* WS14/15
 				style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
 				style.setFillPattern(CellStyle.SOLID_FOREGROUND);
 				cell.setCellStyle(style);
 				
-
 			}
 
-			Row rowEmpty = sheet.createRow(rownum++);									// *NEU* WS14/15
-
+			Row kommentare = sheet.createRow(rownum++);
+			System.out.println("Ich bin Zeile "+ rownum);// *NEU* WS14/15
+				ArrayList<String> infosStellplatz = infos.get(key);
+				int zellnr = 0;
+				for (Object einzelneInfo : infosStellplatz) {
+					Cell zelle = kommentare.createCell(zellnr++);
+					zelle.setCellValue((String) einzelneInfo);
+				}
+				
+				
+			
 		}
 
 		try {
