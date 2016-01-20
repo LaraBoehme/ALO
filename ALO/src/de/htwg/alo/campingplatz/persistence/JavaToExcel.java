@@ -145,7 +145,7 @@ public class JavaToExcel {
 		try {
 			String fileName = jahr + "_" + tempMonat + "_";
 			FileOutputStream out = new FileOutputStream(new File(speicherOrt
-					+ "\\" + fileName + "Belegungsplan.xls"));
+					+ "/" + fileName + "Belegungsplan.xls"));
 			workbook.write(out);
 			out.close();
 

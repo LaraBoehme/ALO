@@ -706,7 +706,7 @@ public class MainFrame {
 			public void actionPerformed(ActionEvent arg0) {
 
 				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(new java.io.File("."));
+				chooser.setCurrentDirectory(new java.io.File(""));
 				chooser.setDialogTitle("Speicherort ausw\u00E4hlen");
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				//
