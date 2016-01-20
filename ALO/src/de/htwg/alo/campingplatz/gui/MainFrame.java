@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.crypto.spec.GCMParameterSpec;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -113,7 +114,7 @@ public class MainFrame {
 	 */
 	public MainFrame() {
 		initialize();
-		if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+		if (new File(chosenXml).exists()){
 			initializeOberflaeche();
 		}
 
@@ -139,15 +140,16 @@ public class MainFrame {
 
 		if (!dataFolder.exists()) {
 			dataFolder.mkdirs();
-			System.out.println("Ordner erstellt.");
 		}
 
 		if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()) {
-			readXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+			chosenXml = dataFolder.getAbsolutePath() + "/Belegungen.xml";
+			readXml(chosenXml);
 			lblProtocol.setText("Belegungsdatei erfolgreich geladen...");
 
 		} else {
 			lblProtocol.setText("Keine Belegungsdatei gefunden...");
+			chosenXml = dataFolder.getAbsolutePath() + "/Belegungen.xml";
 		}
 
 		// JFrame Campingplatz wird erstellt
@@ -560,9 +562,7 @@ public class MainFrame {
 		}
 
 		dtm = new DefaultTableModel(columnName, rowName.length);
-//		dtm.setColumnIdentifiers(rowName);
-//		dtm.setRowCount(tableContent[0].length);
-		
+
 		int subtrahend = 0;
 		for (int i = 0; i < rowName.length; i++) {
 			if(i==0){
@@ -630,7 +630,7 @@ public class MainFrame {
 			public void itemStateChanged(ItemEvent e) {
 				
 //				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
-				if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+				if (new File(chosenXml).exists()){
 					resetOberflaeche();
 				}
 				
@@ -662,7 +662,7 @@ public class MainFrame {
 				scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
 				
 				//Lara Belegungsplan richtig anzeigen für spezielles Jahr
-				if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+				if (new File(chosenXml).exists()){
 					initializeOberflaeche();
 				}
 
@@ -739,13 +739,14 @@ public class MainFrame {
 		btnEinlesen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!textPane_dateiName.getText().equalsIgnoreCase("")) {
-
+					
+					resetOberflaeche();
+					cp.newStellplaetze(cp.getAnzahlStellplaetze());
 					readXml(chosenXml);
-					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 					initializeOberflaeche();
 					JOptionPane.showMessageDialog(null, "Belegungsdatei erfolgreich eingelesen!");
 				} else {
-					JOptionPane.showMessageDialog(null, "keine Datei ausgew\u00E4hlt");
+					JOptionPane.showMessageDialog(null, "Bitte w\u00E4hlen Sie zuerst eine Datei aus!");
 				}
 
 			}
@@ -759,15 +760,24 @@ public class MainFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (!textPane_dateiName.getText().equalsIgnoreCase("")) {
 
-					cp.resetStellplaetze(); // Lara findet überflüssig
-					cp.newStellplaetze(anzahlStellplaetze);
-					readXml(chosenXml);
-					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 					resetOberflaeche();
+					cp.newStellplaetze(cp.getAnzahlStellplaetze());
+					readXml(chosenXml);
 					initializeOberflaeche();
-					JOptionPane.showMessageDialog(null, "Belegungsdatei erfolgreich eingelesen!");
+					
+					if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+						File zuLoeschen = new File(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+						zuLoeschen.delete();
+					}
+					File neu = new File(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+					File alteDatei = new File(chosenXml);
+					alteDatei.delete();
+			
+					
+					JOptionPane.showMessageDialog(null, "Belegungsdatei erfolgreich eingelesen und alte Belegungsdatei \u00fcberschrieben!");
 				} else {
-					JOptionPane.showMessageDialog(null, "keine Datei ausgew\u00E4hlt");
+					JOptionPane.showMessageDialog(null, "Bitte w\u00E4hlen Sie zuerst eine Datei aus!");
 				}
 
 			}
@@ -812,9 +822,9 @@ public class MainFrame {
 				int rueckgabewert = jc.showOpenDialog(null);
 				if (rueckgabewert == JFileChooser.APPROVE_OPTION) {
 					chosenXml = jc.getSelectedFile().getAbsolutePath();
+					System.out.println("Datei "+jc.getSelectedFile().getAbsolutePath() +" zum einlesen ausgewählt");
 					textPane_dateiName.setText(jc.getSelectedFile().getName());
 				}
-				initializeOberflaeche();
 			}
 		});
 
@@ -847,7 +857,11 @@ public class MainFrame {
 		ausfuehrenSp.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				if (eingabeSp.getText() != "") {
+				
+				if (eingabeSp.getText().equalsIgnoreCase("")) {
+					JOptionPane.showMessageDialog(null, "Sie müssen zuerst die Anzahl der Stellplätze eingeben!");
+					return;
+				}
 					int anzahlStellplaetze = Integer.parseInt(eingabeSp.getText());
 					cp.setAnzahlStellplaetze(anzahlStellplaetze);
 					cp.aendereAnzahlStellplaetze(anzahlStellplaetze);
@@ -875,13 +889,15 @@ public class MainFrame {
 					comboBox_StellPlatz.setModel(new DefaultComboBoxModel(neueStellplaetze));
 					comboBox_sp.setModel(new DefaultComboBoxModel(neueStellplaetze));
 					
-					if (new File(dataFolder.getAbsolutePath() + "/Belegungen.xml").exists()){
+					if (new File(chosenXml).exists()){
 						initializeOberflaeche();
 					}
+					JOptionPane.showMessageDialog(null,
+							"<html>Die Anzahl der Stellplätze wurde auf " + eingabeSp
+									.getText() + " geändert.");
 
 				}
 
-			}
 		});
 
 		// button 'BUCHEN'
@@ -895,7 +911,11 @@ public class MainFrame {
 					JOptionPane.showMessageDialog(null, "Sie müssen einen Namen angeben!");
 					return;
 				}
-
+				if (dauerBuchen.getText().equalsIgnoreCase("")) {
+					JOptionPane.showMessageDialog(null, "Sie müssen noch angeben, wie lange der Gast bleibt!");
+					return;
+				}
+				
 				if (comboBox_tag.getSelectedIndex() <= 8) {
 					myDate = "0" + (comboBox_tag.getSelectedIndex() + 1) + ".";
 				} else {
@@ -940,7 +960,7 @@ public class MainFrame {
 							(Integer.parseInt(dauerBuchen.getText())), limit, txtField_name.getText(),
 							comboBox_StellPlatz.getSelectedIndex(),zusatzInfosEingabe.getText());
 
-					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+					cp.belegungToXml(chosenXml);
 					initializeOberflaeche(); // WS 14/15
 
 				} else { // checker = true (Platz ist frei)
@@ -951,7 +971,7 @@ public class MainFrame {
 
 					JOptionPane.showMessageDialog(null,
 							"<html>Buchung erfolgreich!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
-					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+					cp.belegungToXml(chosenXml);
 
 					initializeOberflaeche();
 				}
@@ -971,7 +991,6 @@ public class MainFrame {
 				panelAuslastung.removeAll();
 				panelAuslastung.add(lblAuslastung);
 				panelAuslastung.updateUI();
-				System.out.println(lblText);
 
 				return; // WS 14/15
 			}
@@ -980,15 +999,21 @@ public class MainFrame {
 		// button 'LOESCHEN'
 		buttonDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int dauer = Integer.parseInt(dauerLoeschen.getText());
-				int platz = comboBox_sp.getSelectedIndex() + 1;
-
-				String myDate = "";
-
+				
 				if (txtField_name_del.getText().equalsIgnoreCase("")) {
 					JOptionPane.showMessageDialog(null, "Geben Sie den Namen des zu löschenden Gastes ein!");
 					return;
 				}
+				
+				if (dauerLoeschen.getText().equalsIgnoreCase("")) {
+					JOptionPane.showMessageDialog(null, "Sie müssen noch eingeben, für wie viele Tage der Gast gelöscht werden soll. ");
+					return;
+				}
+				
+				int dauer = Integer.parseInt(dauerLoeschen.getText());
+				int platz = comboBox_sp.getSelectedIndex() + 1;
+
+				String myDate = "";
 
 				if (comboBox_tag_del.getSelectedIndex() <= 8) {
 					myDate = "0" + (comboBox_tag_del.getSelectedIndex() + 1) + ".";
@@ -1039,7 +1064,7 @@ public class MainFrame {
 										.getText() + " wurde ab dem Datum " + myDate + " vom Stellplatz " + platz
 								+ " für die angegebene Dauer von " + dauer
 								+ " Tag(en) gelöscht!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
-						cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+						cp.belegungToXml(chosenXml);
 						resetOberflaeche();
 						initializeOberflaeche();
 //						readXml(dataFolder.getAbsolutePath() + "\\Belegungen.xml");
@@ -1051,8 +1076,8 @@ public class MainFrame {
 								"<html>Der Gast " + txtField_name_del
 										.getText() + " wurde ab dem Datum " + myDate + " vom Stellplatz " + platz
 								+ " entfernt, jedoch nicht für die angegebene Dauer von " + dauer
-								+ " Tag(en). Bitte überprüfen Sie den Belegungsplan!<br>Um die änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
-						cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
+								+ " Tag(en). Bitte überprüfen Sie den Belegungsplan!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
+						cp.belegungToXml(chosenXml);
 						resetOberflaeche();
 						initializeOberflaeche();
 
@@ -1065,19 +1090,14 @@ public class MainFrame {
 			}
 
 		});
-		buttonDel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				cp.xmlToBelegung(dataFolder.getAbsolutePath() + "/Belegungen.xml", columnName[1]);
-			}
-		});
 	}
 
 	private void initializeOberflaeche() {
-		cp.xmlToBelegung(dataFolder.getAbsolutePath() + "/Belegungen.xml", columnName[1]);
+		cp.xmlToBelegung(chosenXml, columnName[1]);
 	}
 
 	private void resetOberflaeche() {    //				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
-		for(int i = 0; i < cp.getAnzahlStellplaetze(); i++){
+		for(int i = 0; i < cp.getAnzahlStellplaetze()*2; i++){
 			System.out.println("Zeile "+i);
 			for(int j = 1; j < columnName.length;j++){
 				System.out.println("Spalte "+j);
@@ -1089,11 +1109,6 @@ public class MainFrame {
 			}	
 		}
 	}
-
-//	private void removeFromOberflaeche(String text, int platz, String myDate, int dauer) {
-//		cp.removeFromOberflaeche(text, platz, myDate, dauer);
-//
-//	}
 
 	protected void readXml(String path) {
 		try {

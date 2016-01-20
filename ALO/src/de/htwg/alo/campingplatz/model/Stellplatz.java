@@ -157,8 +157,8 @@ public class Stellplatz {
 		return 0;
 	}
 
-	public ArrayList<String> getBelegungsPlanSP(String monat, int jahr,
-			int stellplatzNummer, int datenwahl) {
+	public ArrayList<String> getBelegungsPlanSP(String monat, int jahr,int stellplatzNummer, int datenwahl) {
+		
 		ArrayList<String> belegungen = new ArrayList<String>();
 		ArrayList<String> zusatzInfos = new ArrayList<String>();
 		
@@ -167,49 +167,65 @@ public class Stellplatz {
 
 			belegungen.add("" + (stellplatzNummer + 1));
 			zusatzInfos.add("");
+			
 			DateItem currentItem = firstItem;
+
 			DateItem pruefItem = new DateItem(gc.getTime(), "", "");
 			
-			while (gc.get(GregorianCalendar.MONTH) == Integer
-									.parseInt(monat) - 1){
+			if(currentItem != null){									//wenn es überhaupt eine Buchung gibt
+				String tempMonat = DateUtil.getInstance()
+						.formatDate(currentItem.getDate()).substring(3, 5);
 				
-				if(currentItem != null){		//wenn es überhaupt eine Buchung gibt
-					String tempMonat = DateUtil.getInstance()
-							.formatDate(currentItem.getDate()).substring(3, 5);
-					if(tempMonat.equalsIgnoreCase(monat)){      			// wenn der Buchungsmonat mit dem gewünschten Monat für die Excel-Tabelle übereinstimmt
-						if(DateUtil.getInstance().formatDate(gc.getTime()).
-								equalsIgnoreCase(DateUtil.getInstance().formatDate(currentItem.getDate()))){ //wenn die Daten gleich sind
-							belegungen.add(currentItem.getName());
-							if(pruefItem.getName()==currentItem.getName() && pruefItem.getZusatzInfos() == currentItem.getZusatzInfos()){
-								zusatzInfos.add("");
+				while(currentItem.next!=null && tempMonat.equals(monat)==false){     // wenn die Buchung nicht im gewünschten Monat liegt wird die nächste Buchung gelesen
+						currentItem = currentItem.next;
+						tempMonat = DateUtil.getInstance()
+								.formatDate(currentItem.getDate()).substring(3, 5);
+				}
+				
+				while (gc.get(GregorianCalendar.MONTH) == Integer      // wenn der Buchungsmonat mit dem gewünschten Monat für die Excel-Tabelle übereinstimmt
+										.parseInt(monat) - 1){
+						
+						if(tempMonat.equalsIgnoreCase(monat)){ 
+							
+							if(DateUtil.getInstance().formatDate(gc.getTime()).
+									equalsIgnoreCase(DateUtil.getInstance().formatDate(currentItem.getDate()))){   //wenn die Daten gleich sind
+								belegungen.add(currentItem.getName());
+								
+								if(pruefItem.getName()==currentItem.getName() && pruefItem.getZusatzInfos() == currentItem.getZusatzInfos()){
+									zusatzInfos.add("");
+								}else{
+									zusatzInfos.add(currentItem.getZusatzInfos());
+								}
+								pruefItem = currentItem;
+								if(currentItem.next != null){
+									currentItem = currentItem.next;
+								}
 							}else{
-								zusatzInfos.add(currentItem.getZusatzInfos());
+								belegungen.add("");
+								zusatzInfos.add("");
 							}
-							pruefItem = currentItem;
-							currentItem = currentItem.next;
 						}else{
 							belegungen.add("");
 							zusatzInfos.add("");
 						}
-					}else{
-						belegungen.add("");
-						zusatzInfos.add("");
-					}
+						
 					
-				}else{
-					belegungen.add("");
-					zusatzInfos.add("");
+					gc.add(Calendar.DATE, 1);
 				}
 				
-				gc.add(Calendar.DATE, 1);
 			}
+			for(int i = (gc.getActualMinimum(Calendar.DAY_OF_MONTH)); i <= (gc.getActualMaximum(Calendar.DAY_OF_MONTH)); i++){
+				belegungen.add("");
+				zusatzInfos.add("");
+			}
+			
 			if(datenwahl==1){
 				return belegungen;
 			}else{
 			return zusatzInfos;
-		}
+			}
 		
-	}
+		}
 
 	public class DateItem {
 		public DateItem next = null;

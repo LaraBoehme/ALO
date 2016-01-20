@@ -153,35 +153,12 @@ public class Campingplatz {
 
 	}
 
-	public void resetStellplaetze() { // Lara findet überflüssig
-		this.stellplaetze = null;
-	}
-
 	public void newStellplaetze(int anzahlStellplaetze) {
-		this.stellplaetze = null;
+		stellplaetze.removeAll(stellplaetze);
 		for (int i = 0; i < anzahlStellplaetze; i++) {
 			stellplaetze.add(new Stellplatz());
 		}
 	}
-
-//	public void removeFromOberflaeche(String text, int platz, String myDate,
-//			int dauer) {
-//
-//		GregorianCalendar first = new GregorianCalendar(2014,
-//				GregorianCalendar.APRIL, 1);
-//		Date currentDate = null;
-//		currentDate = DateUtil.getInstance().formatString(myDate);
-//		long result = currentDate.getTime() - first.getTimeInMillis();
-//		result = result / (1000 * 60 * 60 * 24); // umrechnung in Tage
-//
-//		int col = platz;
-//		int row = (int) result;
-//
-//		for (int i = 0; i < dauer + 1; i++) {
-//			MainFrame.dtm.setValueAt("", row++, col);
-//		}
-//
-//	}
 	
 	public void aendereAnzahlStellplaetze(int anzahlStellplaetze){
 		if(stellplaetze.size() >= anzahlStellplaetze){

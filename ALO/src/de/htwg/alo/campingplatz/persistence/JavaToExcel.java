@@ -105,7 +105,6 @@ public class JavaToExcel {
 			zusatzInfos = cp.getBelegungsPlan(stringMonat, jahr, stellplatzNummer, 2);
 			data.put((i + 2), belegungen);
 			infos.put((i+2), zusatzInfos);
-		
 
 			stellplatzNummer++;
 
@@ -133,16 +132,13 @@ public class JavaToExcel {
 				
 			}
 
-			Row kommentare = sheet.createRow(rownum++);
-			System.out.println("Ich bin Zeile "+ rownum);// *NEU* WS14/15
+			Row kommentare = sheet.createRow(rownum++);// *NEU* WS14/15
 				ArrayList<String> infosStellplatz = infos.get(key);
 				int zellnr = 0;
 				for (Object einzelneInfo : infosStellplatz) {
 					Cell zelle = kommentare.createCell(zellnr++);
 					zelle.setCellValue((String) einzelneInfo);
-				}
-				
-				
+				}	
 			
 		}
 
