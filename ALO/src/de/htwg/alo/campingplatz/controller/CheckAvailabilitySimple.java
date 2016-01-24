@@ -130,9 +130,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 			int stellplatzIndex, Date datum, int dauer, String name, String zusatzInfos) {
 
 		for (int j = 0; j < dauer; j++) {
-			System.out.println(j+1);
 			belegeStellplatz(stellplaetze.get(stellplatzIndex), datum, dauer, name, zusatzInfos); /* WiSe14/15 */   //Lara statt j wird hier der stellplatzIndex übergeben
-
 		}
 	}
 
@@ -141,19 +139,11 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 			int dauer, String name, String zusatzInfos) { /* WiSe14/15 */
 
 		for (int j = 0; j < dauer; j++) {
-			System.out.println(datum);
 			stellplatz.addDate(datum, name, zusatzInfos);
 			datum = new Date(datum.getTime() + 24 * 60 * 60 * 1000);
 		}
 	} /* WiSe14/15 */
 
-	public ArrayList<String> getBelegungsPlan(ArrayList<Stellplatz> stellplaetze,
-			int stellplatzNummer, String monat, int jahr, int datenwahl) {
-		ArrayList<String> tempBelegung = stellplaetze.get(stellplatzNummer)
-				.getBelegungsPlanSP(monat, jahr, stellplatzNummer,datenwahl);
-		return tempBelegung;
-
-	}
 
 	@Override
 	public Set<String> getAllBelegungenForMonth(ArrayList<Stellplatz> stellplaetze,				/* WiSe14/15 */

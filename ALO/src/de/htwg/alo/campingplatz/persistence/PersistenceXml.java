@@ -10,7 +10,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,7 +58,7 @@ public class PersistenceXml {
 				Calendar calCurrItemNext = Calendar.getInstance();
 	
 				while ((currItem.next != null)
-						&& (currItem.next.getName().equals(currItem.getName()))) {
+						&& (currItem.next.getName().equals(currItem.getName()) && currItem.next.getZusatzInfos().equals(currItem.getZusatzInfos()))) {
 					calCurrItemNext.setTime(currItem.next.getDate());
 					int tagCurrItemNext = calCurrItemNext.get(Calendar.DAY_OF_YEAR);
 					System.out.println(tagCurrItemNext);
@@ -143,5 +146,126 @@ public class PersistenceXml {
 			e1.printStackTrace();
 		}
 
+	}
+	
+	public static ArrayList<String> readXmlForExcel(String path, Campingplatz cp, int jahr, int monat, int stellplatz, int auswahl){
+		
+		ArrayList<String> namen = new ArrayList<String>();
+		ArrayList<String> zusatzInfos = new ArrayList<String>();
+		ArrayList<String> belegungen = new ArrayList<String>();
+		
+		namen.add("" + (stellplatz));
+		System.out.println("Zu namen hinzugefügt: " + namen.get(0));
+		zusatzInfos.add("");
+		System.out.println("Zu zusatzInfos hinzugefügt: " + zusatzInfos.get(0));
+		
+		try {
+
+			File fXmlFile = new File(path);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("Belegung");
+			
+				for (int temp = 0; temp < nList.getLength(); temp++) {     //läuft über alle Belegungen in xml
+					System.out.println("Belegungen hat diese Länge: " + belegungen.size());
+					
+					Node nNode = nList.item(temp);
+
+					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) nNode;
+						
+						if(Integer.parseInt(eElement.getElementsByTagName("Stellplatz").item(0).getTextContent()) == stellplatz){
+							System.out.println("ja Stellplatz " + (stellplatz));
+							
+							String jahrBelegungString = eElement.getElementsByTagName("DatumVon").item(0).getTextContent().substring(6);
+							int jahrBelegung = Integer.parseInt(jahrBelegungString);
+							
+							if( jahrBelegung == jahr){
+								System.out.println("Ja Jahre stimmern überein");
+								
+								String monatBelegungString = eElement.getElementsByTagName("DatumVon").item(0).getTextContent().substring(3,5);
+								int monatBelegung = Integer.parseInt(monatBelegungString);
+								
+								if(monatBelegung == monat){
+									System.out.println("Ja Monate stimmen überein");
+									belegungen.add(eElement.getElementsByTagName("DatumVon").item(0).getTextContent());
+									belegungen.add(eElement.getElementsByTagName("Dauer").item(0).getTextContent());
+									belegungen.add(eElement.getElementsByTagName("Name").item(0).getTextContent());
+									belegungen.add(eElement.getElementsByTagName("Zusatzinformationen").item(0).getTextContent());
+									System.out.println("belegungen hat diese Länge: " + belegungen.size());
+								}
+							}
+							
+						}
+					}
+				}
+					DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+					GregorianCalendar gc = new GregorianCalendar();
+					gc.set(jahr, monat - 1, 01);			//gregorianCalendar wird wieder auf Anfang gesetzt
+					int currentMonth = gc.get(GregorianCalendar.MONTH);
+					
+					int datumZaehler = 0;
+					int dauerZaehler = 1;
+					int namenZaehler = 2;
+					int infosZaehler = 3;
+					int anzahlBelegungen = belegungen.size();
+					
+					if(belegungen.size() != 0){
+						System.out.println("Belegungen size ist größer null, nämlich " + belegungen.size());
+						while(gc.get(Calendar.MONTH) == currentMonth){
+							System.out.println("Datum: " + gc.getTime());
+							
+							if(anzahlBelegungen > 0){
+								if(belegungen.get(datumZaehler).equalsIgnoreCase(df.format(gc.getTime()))){
+									datumZaehler = datumZaehler + 4;
+									for(int dauer = 0; dauer < Integer.parseInt(belegungen.get(dauerZaehler)); dauer++){
+										namen.add(belegungen.get(namenZaehler));
+										if(dauer == 0){
+											zusatzInfos.add(belegungen.get(infosZaehler));
+										}else{
+											zusatzInfos.add("");
+										}
+										gc.add(Calendar.DATE, 1);
+									}
+									dauerZaehler = dauerZaehler + 4;
+									namenZaehler = namenZaehler + 4;
+									infosZaehler = infosZaehler + 4;
+									anzahlBelegungen = anzahlBelegungen -4;
+								}else{
+									namen.add("");
+									zusatzInfos.add("");
+									gc.add(Calendar.DATE, 1);
+								}
+							}else{
+								namen.add("");
+								zusatzInfos.add("");
+								gc.add(Calendar.DATE, 1);
+							}	
+					}
+					
+				}else{
+					for(int j = (gc.getActualMinimum(Calendar.DAY_OF_MONTH)); j <= (gc.getActualMaximum(Calendar.DAY_OF_MONTH)); j++){
+						namen.add("");
+						zusatzInfos.add("");
+					}
+				}
+				
+			
+
+		} catch (Exception e1) {
+			// e1.printStackTrace();
+		}
+		
+		if(auswahl == 1){
+			return namen;	
+		}else{
+			return zusatzInfos;
+		}
+		
+		
 	}
 }

@@ -4,18 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.GridLayout;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
-import javax.crypto.spec.GCMParameterSpec;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -62,11 +57,13 @@ public class MainFrame {
 	Campingplatz cp = new Campingplatz(anzahlStellplaetze, new CheckAvailabilitySimple());
 	
 	private JFrame frmCampingplatzVerwaltung;
+	private JLabel lblProtocol;
 	private JTextField txtField_name;
 	private JTextField txtField_name_del;
+	
 	private String chosenXml = "";
+	private String ausgewaehlteXml = "";
 	private File dataFolder;
-	private JLabel lblProtocol;
 	
 	Calendar cal = new GregorianCalendar(); // new
 
@@ -93,6 +90,7 @@ public class MainFrame {
 	/**
 	 * Launch the application.
 	 */
+	
 	public static void main(String[] args) {
 
 		EventQueue.invokeLater(new Runnable() {
@@ -112,6 +110,7 @@ public class MainFrame {
 	/**
 	 * Create the application.
 	 */
+	
 	public MainFrame() {
 		initialize();
 		if (new File(chosenXml).exists()){
@@ -130,7 +129,6 @@ public class MainFrame {
 		// wurde oder nicht
 		// Lara geändert damit man das Label sieht & alles richtig angezeigt
 		// wird oder erstellt wird
-		// lblProtocol = new JLabel("");
 		lblProtocol = new JLabel();
 		lblProtocol.setBounds(10, 780, 250, 20);
 
@@ -472,7 +470,7 @@ public class MainFrame {
 		JButton btnNewButton_waehleSpeicherortBel = new JButton("Ausw\u00E4hlen");
 		btnNewButton_waehleSpeicherortBel.setBounds(290, 100, 110, 25);
 		panelExcel.add(btnNewButton_waehleSpeicherortBel);
-		
+				
 		final JLabel lblSpeicherort = new JLabel("Speicherort:");
 		lblSpeicherort.setBounds(10, 146, 89, 14);
 		panelExcel.add(lblSpeicherort);
@@ -481,6 +479,28 @@ public class MainFrame {
 		textPane_speicherOrtBel.setBounds(141, 146, 278, 14);
 		panelExcel.add(textPane_speicherOrtBel);
 		textPane_speicherOrtBel.setBorder(LineBorder.createBlackLineBorder());
+		
+		// Speicherort waehlen
+		btnNewButton_waehleSpeicherortBel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(new java.io.File(""));
+				chooser.setDialogTitle("Speicherort ausw\u00E4hlen");
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				//
+				// "Alle Datein"-Option deaktivieren
+				//
+				chooser.setAcceptAllFileFilterUsed(false);
+				//
+				int rueckgabewert = chooser.showOpenDialog(null);
+				if (rueckgabewert == JFileChooser.APPROVE_OPTION) {
+					textPane_speicherOrtBel.setText(chooser.getSelectedFile().getAbsolutePath());
+				}
+
+			}
+
+		});
 
 		// Button Erstellen Belegungsplan erstellen
 		JButton btnErstellen = new JButton("Erstellen");
@@ -496,7 +516,7 @@ public class MainFrame {
 																		// April
 					int jahr = (Integer) comboBoxYear.getSelectedItem();
 
-					new JavaToExcel().exportToExcel(monat, jahr, cp, textPane_speicherOrtBel.getText());
+					new JavaToExcel().xmlExportToExcel(monat, jahr, cp, textPane_speicherOrtBel.getText(), chosenXml);
 					JOptionPane.showMessageDialog(null,
 							"Belegungsplan erfolgreich unter " + textPane_speicherOrtBel.getText() + " abgespeichert");
 				} else {
@@ -508,16 +528,11 @@ public class MainFrame {
 		panelExcel.add(btnErstellen);
 
 		// 4.Belegungsplan
-		// btnPanel.setSize(1000, 1000);
 		JPanel btnPanel = new JPanel(); // V1.1 SOSE014 - Neu
 		btnPanel.setBounds(tabbedPane.getBounds());
 		JPanel panelBelegungsplan = new JPanel();
 		panelBelegungsplan.setPreferredSize(tabbedPane.getSize());// SoSe 2014 -
 																	// new
-		// Dimension(800, 600));
-		// panelBelegungsplan.setSize(1600, 920);
-		// panelBelegungsplan.setBounds(0, 0, 1600, 920);
-
 		frmCampingplatzVerwaltung.add(new JScrollPane(tabbedPane));
 		frmCampingplatzVerwaltung.pack();
 		tabbedPane.addTab("Belegungsplan", null, panelBelegungsplan, null);
@@ -529,7 +544,6 @@ public class MainFrame {
 
 		// Sebi: combobox einfügen für auswahl des jahres
 		final JComboBox<Integer> comboBoxYear2 = new JComboBox<Integer>();
-		// comboBoxYear2.setModel(new DefaultComboBoxModel<Integer>());
 
 		for (int n = cal.get(Calendar.YEAR) - 2; n <= cal.get(Calendar.YEAR) + 10; n++) {
 			comboBoxYear2.addItem(n);
@@ -543,14 +557,8 @@ public class MainFrame {
 		GregorianCalendar first = new GregorianCalendar((int) comboBoxYear2.getSelectedItem(), // change
 																								// "2014"
 				GregorianCalendar.APRIL, 1);
-
-		// Ende wird nie benutzt
-		GregorianCalendar last = new GregorianCalendar((int) comboBoxYear2.getSelectedItem(),
-				GregorianCalendar.SEPTEMBER, 30);
-		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
 		
-		String[][] tableContent = new String[184][40];// SoSe 2014 - auf 184 days geändert, da September 30 Tage
-		//Lara auf 183 Tage geändert, sonst Anzeige von 1.10. dabei
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
 
 		String[] rowName = new String[40];
 		
@@ -576,8 +584,6 @@ public class MainFrame {
 				}
 			}
 		}
-		// Sebi: sagt unnötig
-		// first.set(2015, 3, 1);
 
 		JTable table = new JTable(dtm);
 		table.setEnabled(false);
@@ -587,8 +593,6 @@ public class MainFrame {
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		table.setVisible(true);// SoSe 2014 - added
 		table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
-		TableColumnModel tcm = table.getColumnModel();
-//		tcm.getColumn(0).setPreferredWidth(90);
 
 		// um erste Spalte mit Stellplatz zu fixieren beim horizontalem Scrollen
 		JTable fixed = new JTable();
@@ -606,10 +610,6 @@ public class MainFrame {
 		scrollVert.setRowHeaderView(fixed);
 		scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
 
-		// // SoSe 2014 - for schleife die für alle Colums reziable ausschaltet
-		// for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
-		// table.getColumnModel().getColumn(i).setResizable(false);
-		// }
 		scrollVert.setPreferredSize(tabbedPane.getSize());
 
 		table.setGridColor(Color.LIGHT_GRAY);
@@ -690,6 +690,52 @@ public class MainFrame {
 		JButton ausfuehrenSp = new JButton("\u00dcbernehmen");
 		ausfuehrenSp.setBounds(260, 10, 110, 25);
 		panelEinstellungen.add(ausfuehrenSp);
+		
+		// Lara ActionListener für Anzahl Stellplätze verändern
+				ausfuehrenSp.addActionListener(new ActionListener() {
+
+					public void actionPerformed(ActionEvent e) {
+						
+						if (eingabeSp.getText().equalsIgnoreCase("")) {
+							JOptionPane.showMessageDialog(null, "Sie müssen zuerst die Anzahl der Stellplätze eingeben!");
+							return;
+						}
+							int anzahlStellplaetze = Integer.parseInt(eingabeSp.getText());
+							cp.setAnzahlStellplaetze(anzahlStellplaetze);
+							cp.aendereAnzahlStellplaetze(anzahlStellplaetze, chosenXml);
+							
+							String[] neueStellplaetze = new String[anzahlStellplaetze];
+							for (int i = 0; i < cp.getAnzahlStellplaetze(); i++) {
+								neueStellplaetze[i] = String.valueOf(i + 1);
+							}
+						
+							String[] neueStellplaetzeFuerBelegungsplan = new String[anzahlStellplaetze*2];
+							dtm.setRowCount(neueStellplaetzeFuerBelegungsplan.length);
+							int subtrahend = 0;
+							for (int i = 0; i < neueStellplaetzeFuerBelegungsplan.length; i++) {
+								if(i==0){
+									dtm.setValueAt((i+1), i, 0);	
+								}else{
+									if(i%2==0){
+										dtm.setValueAt(i-subtrahend, i, 0);
+										subtrahend++;
+									}else{
+										dtm.setValueAt(" ", i, 0);
+									}
+								}
+							}
+							comboBox_StellPlatz.setModel(new DefaultComboBoxModel(neueStellplaetze));
+							comboBox_sp.setModel(new DefaultComboBoxModel(neueStellplaetze));
+							
+							if (new File(chosenXml).exists()){
+								initializeOberflaeche();
+							}
+							JOptionPane.showMessageDialog(null,
+									"<html>Die Anzahl der Stellplätze wurde auf " + eingabeSp
+											.getText() + " geändert.");
+						}
+
+				});
 
 		// Belegungsdatei einlesen
 		JLabel belegdateiHochladen = new JLabel("Belegungsdatei einlesen:");
@@ -700,28 +746,6 @@ public class MainFrame {
 		JButton btnAuswaehlen = new JButton("Ausw\u00E4hlen");
 		btnAuswaehlen.setBounds(170, 45, 102, 25);
 		panelEinstellungen.add(btnAuswaehlen);
-
-		// Speicherort waehlen
-		btnNewButton_waehleSpeicherortBel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-
-				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(new java.io.File(""));
-				chooser.setDialogTitle("Speicherort ausw\u00E4hlen");
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				//
-				// "Alle Datein"-Option deaktivieren
-				//
-				chooser.setAcceptAllFileFilterUsed(false);
-				//
-				int rueckgabewert = chooser.showOpenDialog(null);
-				if (rueckgabewert == JFileChooser.APPROVE_OPTION) {
-					textPane_speicherOrtBel.setText(chooser.getSelectedFile().getAbsolutePath());
-				}
-
-			}
-
-		});
 
 		// Belegungsdatei
 		final JLabel txtpnBelegungsdatei = new JLabel();
@@ -739,7 +763,7 @@ public class MainFrame {
 		btnEinlesen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!textPane_dateiName.getText().equalsIgnoreCase("")) {
-					
+					chosenXml = ausgewaehlteXml;
 					resetOberflaeche();
 					cp.newStellplaetze(cp.getAnzahlStellplaetze());
 					readXml(chosenXml);
@@ -759,7 +783,7 @@ public class MainFrame {
 		btnEinlesenUber.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!textPane_dateiName.getText().equalsIgnoreCase("")) {
-
+					chosenXml = ausgewaehlteXml;
 					resetOberflaeche();
 					cp.newStellplaetze(cp.getAnzahlStellplaetze());
 					readXml(chosenXml);
@@ -769,12 +793,11 @@ public class MainFrame {
 						File zuLoeschen = new File(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 						zuLoeschen.delete();
 					}
-					File neu = new File(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 					cp.belegungToXml(dataFolder.getAbsolutePath() + "/Belegungen.xml");
 					File alteDatei = new File(chosenXml);
 					alteDatei.delete();
+					chosenXml = dataFolder.getAbsolutePath() + "/Belegungen.xml";
 			
-					
 					JOptionPane.showMessageDialog(null, "Belegungsdatei erfolgreich eingelesen und alte Belegungsdatei \u00fcberschrieben!");
 				} else {
 					JOptionPane.showMessageDialog(null, "Bitte w\u00E4hlen Sie zuerst eine Datei aus!");
@@ -821,7 +844,7 @@ public class MainFrame {
 				jc.setFileFilter(new MyFilter(".xml"));
 				int rueckgabewert = jc.showOpenDialog(null);
 				if (rueckgabewert == JFileChooser.APPROVE_OPTION) {
-					chosenXml = jc.getSelectedFile().getAbsolutePath();
+					ausgewaehlteXml = jc.getSelectedFile().getAbsolutePath();
 					System.out.println("Datei "+jc.getSelectedFile().getAbsolutePath() +" zum einlesen ausgewählt");
 					textPane_dateiName.setText(jc.getSelectedFile().getName());
 				}
@@ -852,53 +875,6 @@ public class MainFrame {
 		// ------------------------------------------------
 
 		// Ereignisverarbeitung
-
-		// Lara ActionListener für Anzahl Stellplätze verändern
-		ausfuehrenSp.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				
-				if (eingabeSp.getText().equalsIgnoreCase("")) {
-					JOptionPane.showMessageDialog(null, "Sie müssen zuerst die Anzahl der Stellplätze eingeben!");
-					return;
-				}
-					int anzahlStellplaetze = Integer.parseInt(eingabeSp.getText());
-					cp.setAnzahlStellplaetze(anzahlStellplaetze);
-					cp.aendereAnzahlStellplaetze(anzahlStellplaetze);
-					
-					String[] neueStellplaetze = new String[anzahlStellplaetze];
-					for (int i = 0; i < cp.getAnzahlStellplaetze(); i++) {
-						neueStellplaetze[i] = String.valueOf(i + 1);
-					}
-				
-					String[] neueStellplaetzeFuerBelegungsplan = new String[anzahlStellplaetze*2];
-					dtm.setRowCount(neueStellplaetzeFuerBelegungsplan.length);
-					int subtrahend = 0;
-					for (int i = 0; i < neueStellplaetzeFuerBelegungsplan.length; i++) {
-						if(i==0){
-							dtm.setValueAt((i+1), i, 0);	
-						}else{
-							if(i%2==0){
-								dtm.setValueAt(i-subtrahend, i, 0);
-								subtrahend++;
-							}else{
-								dtm.setValueAt(" ", i, 0);
-							}
-						}
-					}
-					comboBox_StellPlatz.setModel(new DefaultComboBoxModel(neueStellplaetze));
-					comboBox_sp.setModel(new DefaultComboBoxModel(neueStellplaetze));
-					
-					if (new File(chosenXml).exists()){
-						initializeOberflaeche();
-					}
-					JOptionPane.showMessageDialog(null,
-							"<html>Die Anzahl der Stellplätze wurde auf " + eingabeSp
-									.getText() + " geändert.");
-
-				}
-
-		});
 
 		// button 'BUCHEN'
 		btnBuchen.addActionListener(new ActionListener() {
@@ -1067,9 +1043,7 @@ public class MainFrame {
 						cp.belegungToXml(chosenXml);
 						resetOberflaeche();
 						initializeOberflaeche();
-//						readXml(dataFolder.getAbsolutePath() + "\\Belegungen.xml");
-//						removeFromOberflaeche(txtField_name_del.getText(), platz, myDate, dauer);
-
+						
 					}
 					if (checkRemove < dauer) {
 						JOptionPane.showMessageDialog(null,
@@ -1098,14 +1072,11 @@ public class MainFrame {
 
 	private void resetOberflaeche() {    //				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
 		for(int i = 0; i < cp.getAnzahlStellplaetze()*2; i++){
-			System.out.println("Zeile "+i);
 			for(int j = 1; j < columnName.length;j++){
-				System.out.println("Spalte "+j);
 				if(dtm.getValueAt(i, j) != null){
 					System.out.println("null");
 					dtm.setValueAt(null, i, j);
 				}
-				System.out.println("nicht null");
 			}	
 		}
 	}
@@ -1145,5 +1116,7 @@ public class MainFrame {
 		}
 
 	}
+	
+
 
 }

@@ -23,9 +23,6 @@ public interface ICheckAvailability {
 
 	 void belegeStellplatz(Stellplatz stellplatz,										/* WiSe14/15 */
                           Date datum, int dauer, String name, String zusatzInfos);
-
-	ArrayList<String> getBelegungsPlan(ArrayList<Stellplatz> stellplaetze, int stellplatzNummer,
-			String monat, int jahr, int datenwahl);
 	
 	public Set<String> getAllBelegungenForMonth(ArrayList<Stellplatz> stellplaetze, String month);	/* WiSe14/15 */
 

@@ -57,12 +57,6 @@ public class Campingplatz {
 		currentCheck.belegeStellplatz(stellplaetze, stellplatzIndex, datum,
 				dauer, name, zusatzInfos);
 	}
-
-	public ArrayList<String> getBelegungsPlan(String monat, int jahr,
-			int stellplatzNummer, int datenwahl) {
-		return currentCheck.getBelegungsPlan(stellplaetze, stellplatzNummer,
-				monat, jahr, datenwahl);
-	}
 	
 	public Set<String> getAllBelegungen(String month) {										/* WiSe14/15 */
 		return currentCheck.getAllBelegungenForMonth(stellplaetze, month);
@@ -96,13 +90,10 @@ public class Campingplatz {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(datumVon);
 		int jahr = cal.get(Calendar.YEAR);
-		System.out.println(jahr);
 				
 		GregorianCalendar first = new GregorianCalendar(jahr,
 				GregorianCalendar.APRIL, 1);
-//		GregorianCalendar last = new GregorianCalendar(jahr,
-//				GregorianCalendar.SEPTEMBER, 30);
-//		
+
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
 		
 		int col = 1;// +1 da die erste Spalte f�r das Label Datum
@@ -111,9 +102,6 @@ public class Campingplatz {
 		int row = stellplatzIndex*2;
 		int rowZusatzInfos = (stellplatzIndex*2) + 1;
 
-//		long result = last.getTimeInMillis() - first.getTimeInMillis();
-//		result = result / (1000 * 60 * 60 * 24); // umrechnung in Tage
-//		int length = (int) result;
 		int length = 184;
 		System.out.println(length);
 		
@@ -150,7 +138,6 @@ public class Campingplatz {
 				}
 			}
 		}
-
 	}
 
 	public void newStellplaetze(int anzahlStellplaetze) {
@@ -160,7 +147,7 @@ public class Campingplatz {
 		}
 	}
 	
-	public void aendereAnzahlStellplaetze(int anzahlStellplaetze){
+	public void aendereAnzahlStellplaetze(int anzahlStellplaetze, String chosenXml){
 		if(stellplaetze.size() >= anzahlStellplaetze){
 			int anzahlLoeschen = stellplaetze.size()-anzahlStellplaetze;
 			int loeschen = stellplaetze.size() - 1;
@@ -171,7 +158,7 @@ public class Campingplatz {
 		}else{
 			int anzahlHinzufuegen = anzahlStellplaetze-stellplaetze.size();
 			for(int i = 0; i < anzahlHinzufuegen; i++){
-				stellplaetze.add(new Stellplatz());
+				stellplaetze.add(new Stellplatz());	
 			}
 		}
 	}

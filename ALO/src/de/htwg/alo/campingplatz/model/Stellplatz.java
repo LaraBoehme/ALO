@@ -52,9 +52,10 @@ public class Stellplatz {
 			System.out.println("Datum: "+datum);
 			System.out.println("FirstItem: "+firstItem.getDate());
 			System.out.println("LastItem: "+lastItem.getDate());
+			System.out.println("Daten: "+ lastItem.getName() + " " + lastItem.getZusatzInfos());
 			
 			// neues Datum hinter dem bisherigen letzten 
-			if (lastItem.getDate().before(datum) ) {                            
+			if (lastItem.getDate().before(datum)) {	
 				lastItem.next = new DateItem(datum, name, zusatzInfos);
 				lastItem = lastItem.next;
 				System.out.println("if " + lastItem.getDate());
@@ -68,6 +69,7 @@ public class Stellplatz {
 				System.out.println("---- TEST DATUM VOR ERSTEN -----");
 
 			}
+		
 			DateItem currentItem = firstItem;
 			System.out.println("CurrentItem: "+currentItem.getDate());
 			while (currentItem.next != null) {
@@ -103,10 +105,15 @@ public class Stellplatz {
 			} else {
 				tempItem = firstItem.next;
 				nextItem = firstItem;
+				System.out.println("LastItem: "+lastItem.getDate());
 				while (tempItem != null) {
 					// L�schung des passenden Elementes
 					if (tempItem.getDate().compareTo(datum) == 0
 							&& tempItem.getName().equalsIgnoreCase(name)) {
+						if(lastItem.getDate().equals(tempItem.getDate())){
+							lastItem = nextItem;
+							System.out.println("lastItem neu gesetzt auf " +lastItem.getDate());
+						}
 						nextItem.next = tempItem.next;
 						return 1;
 					} else {
@@ -141,7 +148,6 @@ public class Stellplatz {
 			}
 				
 			if (currentItem.next == null && currentItem.getDate().before(datum)){
-				System.out.println("im if drin");
 				return -1;
 			}
 				
@@ -157,75 +163,6 @@ public class Stellplatz {
 		return 0;
 	}
 
-	public ArrayList<String> getBelegungsPlanSP(String monat, int jahr,int stellplatzNummer, int datenwahl) {
-		
-		ArrayList<String> belegungen = new ArrayList<String>();
-		ArrayList<String> zusatzInfos = new ArrayList<String>();
-		
-		GregorianCalendar gc = new GregorianCalendar(jahr,
-					(Integer.parseInt(monat) - 1), 01);
-
-			belegungen.add("" + (stellplatzNummer + 1));
-			zusatzInfos.add("");
-			
-			DateItem currentItem = firstItem;
-
-			DateItem pruefItem = new DateItem(gc.getTime(), "", "");
-			
-			if(currentItem != null){									//wenn es überhaupt eine Buchung gibt
-				String tempMonat = DateUtil.getInstance()
-						.formatDate(currentItem.getDate()).substring(3, 5);
-				
-				while(currentItem.next!=null && tempMonat.equals(monat)==false){     // wenn die Buchung nicht im gewünschten Monat liegt wird die nächste Buchung gelesen
-						currentItem = currentItem.next;
-						tempMonat = DateUtil.getInstance()
-								.formatDate(currentItem.getDate()).substring(3, 5);
-				}
-				
-				while (gc.get(GregorianCalendar.MONTH) == Integer      // wenn der Buchungsmonat mit dem gewünschten Monat für die Excel-Tabelle übereinstimmt
-										.parseInt(monat) - 1){
-						
-						if(tempMonat.equalsIgnoreCase(monat)){ 
-							
-							if(DateUtil.getInstance().formatDate(gc.getTime()).
-									equalsIgnoreCase(DateUtil.getInstance().formatDate(currentItem.getDate()))){   //wenn die Daten gleich sind
-								belegungen.add(currentItem.getName());
-								
-								if(pruefItem.getName()==currentItem.getName() && pruefItem.getZusatzInfos() == currentItem.getZusatzInfos()){
-									zusatzInfos.add("");
-								}else{
-									zusatzInfos.add(currentItem.getZusatzInfos());
-								}
-								pruefItem = currentItem;
-								if(currentItem.next != null){
-									currentItem = currentItem.next;
-								}
-							}else{
-								belegungen.add("");
-								zusatzInfos.add("");
-							}
-						}else{
-							belegungen.add("");
-							zusatzInfos.add("");
-						}
-						
-					
-					gc.add(Calendar.DATE, 1);
-				}
-				
-			}
-			for(int i = (gc.getActualMinimum(Calendar.DAY_OF_MONTH)); i <= (gc.getActualMaximum(Calendar.DAY_OF_MONTH)); i++){
-				belegungen.add("");
-				zusatzInfos.add("");
-			}
-			
-			if(datenwahl==1){
-				return belegungen;
-			}else{
-			return zusatzInfos;
-			}
-		
-		}
 
 	public class DateItem {
 		public DateItem next = null;
@@ -242,6 +179,10 @@ public class Stellplatz {
 
 		public Date getDate() {
 			return this.value;
+		}
+		
+		public void setDate(Date value) {
+			this.value = value;
 		}
 
 		public String getName() {

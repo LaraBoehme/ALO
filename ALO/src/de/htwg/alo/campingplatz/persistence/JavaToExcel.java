@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -17,7 +18,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -25,97 +25,57 @@ import de.htwg.alo.campingplatz.model.Campingplatz;
 import de.htwg.alo.campingplatz.util.DateUtil;
 
 public class JavaToExcel {
+	
+	public void xmlExportToExcel(int monat, int jahr, Campingplatz cp,
+			String speicherOrt, String path) {
 
-	public void exportToExcel(int monat, int jahr, Campingplatz cp,
-			String speicherOrt) {
-
-		int stellplatzNummer = 0;
-		ArrayList<String> kalender = new ArrayList<String>();
-		ArrayList<String> belegungen = new ArrayList<String>();
-		ArrayList<String> zusatzInfos = new ArrayList<String>();
-		ArrayList<String> leereZeileNachKopfzeile = new ArrayList<String>();
-		
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.set(jahr, (monat - 1), 01);
-		int currentMonth = gc.get(GregorianCalendar.MONTH);
-		String tempMonat = new SimpleDateFormat("MMMM", Locale.GERMAN)
-				.format(gc.getTime());
-
+		
+		String tempMonat = new SimpleDateFormat("MMMM", Locale.GERMAN).format(gc.getTime());
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		HSSFSheet sheet = workbook.createSheet(tempMonat);
 
+		int currentMonth = gc.get(GregorianCalendar.MONTH);
+		
+		ArrayList<String> kalender = new ArrayList<String>();
+		ArrayList<String> leereZeileNachKopfzeile = new ArrayList<String>();
+		ArrayList<String> zusatzInfos = new ArrayList<String>();
+		ArrayList<String> namen = new ArrayList<String>();
+		
 		Map<Integer, ArrayList<String>> data = new HashMap<Integer, ArrayList<String>>();
 		Map<Integer, ArrayList<String>> infos = new HashMap<Integer, ArrayList<String>>();
 
-		String stringMonat = "";
-		switch (monat) {
-		case 1:
-			stringMonat = "01";
-			break;
-		case 2:
-			stringMonat = "02";
-			break;
-		case 3:
-			stringMonat = "03";
-			break;
-		case 4:
-			stringMonat = "04";
-			break;
-		case 5:
-			stringMonat = "05";
-			break;
-		case 6:
-			stringMonat = "06";
-			break;
-		case 7:
-			stringMonat = "07";
-			break;
-		case 8:
-			stringMonat = "08";
-			break;
-		case 9:
-			stringMonat = "09";
-			break;
-		default:
-			stringMonat = monat + "";
-		}
-
-		int zaehler = 1;
 		kalender.add("Stellplatz-Nr. :");
 		leereZeileNachKopfzeile.add("");
 
-		while (gc.get(GregorianCalendar.MONTH) == currentMonth) {
-			kalender.add(DateUtil.getInstance().formatDate(
+		while (gc.get(GregorianCalendar.MONTH) == currentMonth) {		//um das Kalenderblatt hinzuzufügen
+			kalender.add(DateUtil.getInstance().formatDate(				
 					gc.getTime()));
 			leereZeileNachKopfzeile.add("");
-			zaehler++;
 
-			// Tag wird um 1 erh�ht
+			// Tag wird um 1 erhöht
 			gc.add(GregorianCalendar.DAY_OF_MONTH, 1);
 
 		}
-
-		// Alle Tage des Monats werden in die erste Zeile (Kopfzeile) der
-		// Excel-Datei geschrieben
+		// Kopfzeile und eine leere Zeile nach der Kopfzeile
 		data.put(1, kalender);
 		infos.put(1, leereZeileNachKopfzeile);
 		
+		// Schleife läuft über alle Stellplätze
 		for (int i = 0; i < cp.getAnzahlStellplaetze(); i++) {
-			belegungen = cp.getBelegungsPlan(stringMonat, jahr,stellplatzNummer, 1);     // bei 1 holt er die namen der belegungen 
-			zusatzInfos = cp.getBelegungsPlan(stringMonat, jahr, stellplatzNummer, 2);
-			data.put((i + 2), belegungen);
+			namen = PersistenceXml.readXmlForExcel(path, cp, gc.get(Calendar.YEAR),gc.get(Calendar.MONTH), (i+1) ,1);     // bei 1 werden die namen der belegungen geholt
+			zusatzInfos = PersistenceXml.readXmlForExcel(path, cp, gc.get(Calendar.YEAR), gc.get(Calendar.MONTH), (i+1), 2);		// bei 2 die zusatzinformationen der belegungen
+			data.put((i + 2), namen);
 			infos.put((i+2), zusatzInfos);
 
-			stellplatzNummer++;
-
 		}
-
+		
+		//ab hier wird Excel gebaut
 		Set<Integer> keyset = data.keySet();
 		int rownum = 0;
 		for (Integer key : keyset) {
 			Row row = sheet.createRow(rownum++);
-			System.out.println("Ich bin Zeile "+ rownum);
-
 			ArrayList<String> objArr = data.get(key);
 			int cellnum = 0;
 			for (Object obj : objArr) {
@@ -125,21 +85,20 @@ public class JavaToExcel {
 				} else if (obj instanceof Integer) {
 					cell.setCellValue((Integer) obj);
 				}
-				HSSFCellStyle style = workbook.createCellStyle();						// *NEU* WS14/15
+				HSSFCellStyle style = workbook.createCellStyle();						
 				style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
 				style.setFillPattern(CellStyle.SOLID_FOREGROUND);
 				cell.setCellStyle(style);
-				
 			}
 
-			Row kommentare = sheet.createRow(rownum++);// *NEU* WS14/15
+			Row kommentare = sheet.createRow(rownum++);
 				ArrayList<String> infosStellplatz = infos.get(key);
+				System.out.println("Tabelle malen: " + infos.get(key));
 				int zellnr = 0;
 				for (Object einzelneInfo : infosStellplatz) {
 					Cell zelle = kommentare.createCell(zellnr++);
 					zelle.setCellValue((String) einzelneInfo);
 				}	
-			
 		}
 
 		try {
