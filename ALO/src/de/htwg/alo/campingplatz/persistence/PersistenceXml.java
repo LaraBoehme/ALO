@@ -154,6 +154,10 @@ public class PersistenceXml {
 		ArrayList<String> zusatzInfos = new ArrayList<String>();
 		ArrayList<String> belegungen = new ArrayList<String>();
 		
+		GregorianCalendar calGewollt = new GregorianCalendar();
+		calGewollt.set(jahr, monat -1, 01);
+		DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+		
 		namen.add("" + (stellplatz));
 		System.out.println("Zu namen hinzugefügt: " + namen.get(0));
 		zusatzInfos.add("");
@@ -189,6 +193,35 @@ public class PersistenceXml {
 								
 								String monatBelegungString = eElement.getElementsByTagName("DatumVon").item(0).getTextContent().substring(3,5);
 								int monatBelegung = Integer.parseInt(monatBelegungString);
+								System.out.println("monatBelegung: "+ monatBelegung);
+								
+								String tagBelegungString = eElement.getElementsByTagName("DatumVon").item(0).getTextContent().substring(0,2);
+								int tagBelegung = Integer.parseInt(tagBelegungString);
+								
+								System.out.println("tagBelegung: "+ tagBelegung);
+							
+								GregorianCalendar calBelegung = new GregorianCalendar();
+								calBelegung.set(jahrBelegung, monatBelegung - 1, tagBelegung);
+								System.out.println("Datum Belegung: " + calBelegung.getTime());
+								
+								if(calBelegung.before(calGewollt)){
+									String dauerGewolltString = eElement.getElementsByTagName("Dauer").item(0).getTextContent();
+									int dauerGewollt = Integer.parseInt(dauerGewolltString);
+									System.out.println("dauerGewollt " + dauerGewollt);
+									for(int i = 0; i < dauerGewollt; i++){
+										int neuerMonatBelegung = calBelegung.get(Calendar.MONTH) + 1;
+										if(neuerMonatBelegung == monat){
+											belegungen.add(df.format(calBelegung.getTime()));
+											belegungen.add(String.valueOf(dauerGewollt-i));
+											belegungen.add(eElement.getElementsByTagName("Name").item(0).getTextContent());
+											belegungen.add(eElement.getElementsByTagName("Zusatzinformationen").item(0).getTextContent());
+											System.out.println("belegungen hat diese Länge: " + belegungen.size());
+											break;
+										}else{
+											calBelegung.add(Calendar.DATE, 1);
+										}
+									}
+								}
 								
 								if(monatBelegung == monat){
 									System.out.println("Ja Monate stimmen überein");
@@ -203,7 +236,7 @@ public class PersistenceXml {
 						}
 					}
 				}
-					DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+				
 					GregorianCalendar gc = new GregorianCalendar();
 					gc.set(jahr, monat - 1, 01);			//gregorianCalendar wird wieder auf Anfang gesetzt
 					int currentMonth = gc.get(GregorianCalendar.MONTH);
