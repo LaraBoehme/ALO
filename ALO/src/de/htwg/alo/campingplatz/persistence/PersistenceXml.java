@@ -256,13 +256,16 @@ public class PersistenceXml {
 								if(belegungen.get(datumZaehler).equalsIgnoreCase(df.format(gc.getTime()))){
 									datumZaehler = datumZaehler + 4;
 									for(int dauer = 0; dauer < Integer.parseInt(belegungen.get(dauerZaehler)); dauer++){
-										namen.add(belegungen.get(namenZaehler));
-										if(dauer == 0){
-											zusatzInfos.add(belegungen.get(infosZaehler));
-										}else{
-											zusatzInfos.add("");
+										if(gc.get(Calendar.MONTH) + 1 == monat){
+											namen.add(belegungen.get(namenZaehler));
+											if(dauer == 0){
+												zusatzInfos.add(belegungen.get(infosZaehler));
+											}else{
+												zusatzInfos.add("");
+											}
+											gc.add(Calendar.DATE, 1);
 										}
-										gc.add(Calendar.DATE, 1);
+										
 									}
 									dauerZaehler = dauerZaehler + 4;
 									namenZaehler = namenZaehler + 4;
