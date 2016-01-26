@@ -10,13 +10,12 @@ import java.util.Set;
 import de.htwg.alo.campingplatz.controller.ICheckAvailability;
 import de.htwg.alo.campingplatz.gui.MainFrame;
 import de.htwg.alo.campingplatz.persistence.PersistenceXml;
-import de.htwg.alo.campingplatz.util.DateUtil;
 
 public class Campingplatz {
 
-	private ArrayList<Stellplatz> stellplaetze = new ArrayList<Stellplatz>();  //Lara geändert von Array zu ArrayList um hinzufügen und löschen zu ermöglichen
+	private ArrayList<Stellplatz> stellplaetze = new ArrayList<Stellplatz>(); 
 	private ICheckAvailability currentCheck;
-	private int anzahlStellplaetze;  //Lara hinzugefügt um die anzahl der Stellplätze zu setzen
+	private int anzahlStellplaetze; 
 
 	public Campingplatz(int anzahlStellplaetze, ICheckAvailability currentCheck) {
 		this.anzahlStellplaetze = anzahlStellplaetze;
@@ -103,12 +102,10 @@ public class Campingplatz {
 		int rowZusatzInfos = (stellplatzIndex*2) + 1;
 
 		int length = 184;
-		System.out.println(length);
-		
+	
 		GregorianCalendar tempCal = new GregorianCalendar(jahr,
 				GregorianCalendar.APRIL, 1);
 		Date tempDate = tempCal.getTime();
-		System.out.println(tempDate);
 		
 		for (int i = 0; i < length; i++) {
 			if (tempDate.equals(datumVon)) {
@@ -125,11 +122,8 @@ public class Campingplatz {
 				break;
 			}
 			String datumKalender = calendarDatum;
-			System.out.println(datumKalender);
 			String datumRichtig = sdf.format(first.getTime());
-			System.out.println(datumRichtig);
 			if(datumKalender.compareTo(datumRichtig)==0){
-				System.out.println("Geschafft");
 				MainFrame.dtm.setValueAt(name, row, col);
 				MainFrame.dtm.setValueAt(zusatzInfos, rowZusatzInfos, colZusatzInfos);
 				col++;
@@ -147,6 +141,7 @@ public class Campingplatz {
 		}
 	}
 	
+	//Stellplätze hinzufügen oder löschen
 	public void aendereAnzahlStellplaetze(int anzahlStellplaetze, String chosenXml){
 		if(stellplaetze.size() >= anzahlStellplaetze){
 			int anzahlLoeschen = stellplaetze.size()-anzahlStellplaetze;

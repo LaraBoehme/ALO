@@ -127,8 +127,6 @@ public class MainFrame {
 
 		// Label fuer Protokolle -- um anzuzeigen, ob Belegungsdatei gefunden
 		// wurde oder nicht
-		// Lara geändert damit man das Label sieht & alles richtig angezeigt
-		// wird oder erstellt wird
 		lblProtocol = new JLabel();
 		lblProtocol.setBounds(10, 780, 250, 20);
 
@@ -192,8 +190,7 @@ public class MainFrame {
 		tabbedPane.setSize(1280, 720);
 		frmCampingplatzVerwaltung.getContentPane().add(tabbedPane);
 
-		// Sebi: Kalender auf aktuelles Datum setzten - wird nicht benötigt für
-		// belegungsplan
+		// Kalender auf aktuelles Datum setzten
 		if (cal.get(Calendar.MONTH) < 4) {
 			cal.set(cal.get(Calendar.YEAR), 3, 1);
 
@@ -235,7 +232,6 @@ public class MainFrame {
 		for (int n = cal.getActualMinimum(Calendar.DAY_OF_MONTH); n <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); n++) {
 			comboBox_tag.addItem(n);
 		}
-		// Sebi aktueller tag des Monats sofern innerhalb von April-September
 		comboBox_tag.setSelectedIndex(cal.get(Calendar.DAY_OF_MONTH) - 1);
 		panelBuchen.add(comboBox_tag);
 
@@ -243,8 +239,6 @@ public class MainFrame {
 		final JComboBox comboBox_monat = new JComboBox();
 		comboBox_monat.setModel(new DefaultComboBoxModel(months));
 		comboBox_monat.setBounds(300, 49, 120, 25);
-		// Sebi aktueller Monat, da Array nur aus 6 Monaten besteht, und April =
-		// 3 daher -3
 		comboBox_monat.setSelectedIndex(cal.get(Calendar.MONTH) - 3);
 		panelBuchen.add(comboBox_monat);
 		comboBox_monat.addItemListener(new ItemListener() {
@@ -264,7 +258,6 @@ public class MainFrame {
 		for (int n = cal.get(Calendar.YEAR); n <= cal.get(Calendar.YEAR) + 10; n++) {
 			comboBox_jahr.addItem(n);
 		}
-		// Sebi aktuelles Jahr
 		comboBox_jahr.setSelectedIndex(0);
 		panelBuchen.add(comboBox_jahr);
 
@@ -374,14 +367,12 @@ public class MainFrame {
 		for (int n = cal.getActualMinimum(Calendar.DAY_OF_MONTH); n <= cal.getActualMaximum(Calendar.DAY_OF_MONTH); n++) {
 			comboBox_tag_del.addItem(n);
 		}
-		// Sebi aktueller tag des Monats sofern innerhalb von April-September
 		comboBox_tag_del.setSelectedIndex(cal.get(Calendar.DAY_OF_MONTH) - 1);
 		panelLoeschen.add(comboBox_tag_del);
 
 		final JComboBox comboBox_monat_del = new JComboBox();
 		comboBox_monat_del.setModel(new DefaultComboBoxModel(months));
 		comboBox_monat_del.setBounds(305, 90, 120, 25);
-		// Sebi aktueller Monat sofern innerhalb von April-September
 		comboBox_monat_del.setSelectedIndex(cal.get(Calendar.MONTH) - 3);
 		panelLoeschen.add(comboBox_monat_del);
 		comboBox_monat_del.addItemListener(new ItemListener() {
@@ -400,7 +391,6 @@ public class MainFrame {
 		for (int n = cal.get(Calendar.YEAR); n <= cal.get(Calendar.YEAR) + 10; n++) {
 			comboBox_jahr_del.addItem(n);
 		}
-		// Sebi aktuelles jahr
 		comboBox_jahr_del.setSelectedIndex(0);
 		panelLoeschen.add(comboBox_jahr_del);
 
@@ -440,7 +430,6 @@ public class MainFrame {
 		comboBoxMonth.setToolTipText("");
 		comboBoxMonth.setModel(new DefaultComboBoxModel(months));
 		comboBoxMonth.setBounds(280, 11, 120, 25);
-		// Sebi aktueller Monat sofern innerhalb von April-September
 		comboBoxMonth.setSelectedIndex(cal.get(Calendar.MONTH) - 3);
 		panelExcel.add(comboBoxMonth);
 
@@ -455,9 +444,7 @@ public class MainFrame {
 		for (int n = cal.get(Calendar.YEAR) - 2; n <= cal.get(Calendar.YEAR) + 10; n++) {
 			comboBoxYear.addItem(n);
 		}
-		// comboBoxYear.setSelectedIndex(30);
 		comboBoxYear.setBounds(300, 56, 100, 25);
-		// Sebi aktuelles jahr
 		comboBoxYear.setSelectedIndex(cal.get(Calendar.YEAR) - (cal.get(Calendar.YEAR) - 2));
 		panelExcel.add(comboBoxYear);
 
@@ -537,23 +524,19 @@ public class MainFrame {
 		frmCampingplatzVerwaltung.pack();
 		tabbedPane.addTab("Belegungsplan", null, panelBelegungsplan, null);
 
-		// Sebi: Jahr auswählen für Tabelle
+		// Jahr auswählen für Belegungsplananzeige
 		JLabel txtpnjahr = new JLabel("<html>Belegungsplan anzeigen für Jahr: </html>");
 		txtpnjahr.setBounds(10, 11, 205, 34);
 		panelBelegungsplan.add(txtpnjahr);
 
-		// Sebi: combobox einfügen für auswahl des jahres
 		final JComboBox<Integer> comboBoxYear2 = new JComboBox<Integer>();
-
 		for (int n = cal.get(Calendar.YEAR) - 2; n <= cal.get(Calendar.YEAR) + 10; n++) {
 			comboBoxYear2.addItem(n);
 		}
 
-		// Sebi: wird nur einmal beim start aufgerufen, zeigt aktuelles jahr an
 		comboBoxYear2.setSelectedIndex(cal.get(Calendar.YEAR) - (cal.get(Calendar.YEAR) - 2));
 		panelBelegungsplan.add(comboBoxYear2);
 
-		// Sebi: Start der tabelle festlegen
 		GregorianCalendar first = new GregorianCalendar((int) comboBoxYear2.getSelectedItem(), // change
 																								// "2014"
 				GregorianCalendar.APRIL, 1);
@@ -563,7 +546,6 @@ public class MainFrame {
 		String[] rowName = new String[40];
 		
 		columnName[0] = "Stellplatz";
-		// Sebi: Tag +1 für Tabelle im Tool
 		for (int i = 1; i < columnName.length; i++) {
 			columnName[i] = sdf.format(first.getTime());
 			first.add(Calendar.DAY_OF_MONTH, 1);
@@ -621,15 +603,13 @@ public class MainFrame {
 				(((int) tk.getScreenSize().getHeight()) - 100));
 		frmCampingplatzVerwaltung.setDefaultCloseOperation(3);
 		frmCampingplatzVerwaltung.setVisible(true);
-
-		// Sebi: Itemlistener checkbox year
+		
 
 		comboBoxYear2.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				
-//				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
+			
 				if (new File(chosenXml).exists()){
 					resetOberflaeche();
 				}
@@ -661,7 +641,6 @@ public class MainFrame {
 				scrollVert.setRowHeaderView(fixed);
 				scrollVert.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixed.getTableHeader());
 				
-				//Lara Belegungsplan richtig anzeigen für spezielles Jahr
 				if (new File(chosenXml).exists()){
 					initializeOberflaeche();
 				}
@@ -676,7 +655,6 @@ public class MainFrame {
 		tabbedPane.addTab("Einstellungen", null, panelEinstellungen, null);
 		panelEinstellungen.setLayout(null);
 
-		// Lara hinzugefuegt Anzahl Stellplaetze EingabeFeld
 		// Anzahl Stellplätze
 		JLabel anzahlSp = new JLabel("Anzahl Stellpl\u00E4tze:");
 		anzahlSp.setBounds(10, 10, 120, 20);
@@ -691,7 +669,6 @@ public class MainFrame {
 		ausfuehrenSp.setBounds(260, 10, 110, 25);
 		panelEinstellungen.add(ausfuehrenSp);
 		
-		// Lara ActionListener für Anzahl Stellplätze verändern
 				ausfuehrenSp.addActionListener(new ActionListener() {
 
 					public void actionPerformed(ActionEvent e) {
@@ -845,7 +822,6 @@ public class MainFrame {
 				int rueckgabewert = jc.showOpenDialog(null);
 				if (rueckgabewert == JFileChooser.APPROVE_OPTION) {
 					ausgewaehlteXml = jc.getSelectedFile().getAbsolutePath();
-					System.out.println("Datei "+jc.getSelectedFile().getAbsolutePath() +" zum einlesen ausgewählt");
 					textPane_dateiName.setText(jc.getSelectedFile().getName());
 				}
 			}
@@ -1070,11 +1046,10 @@ public class MainFrame {
 		cp.xmlToBelegung(chosenXml, columnName[1]);
 	}
 
-	private void resetOberflaeche() {    //				Lara Inhalt von Tabelle löschen außer Kopfzeile und -spalte
+	private void resetOberflaeche() {    //				Inhalt von Belegungsplananzeige löschen außer Kopfzeile und -spalte
 		for(int i = 0; i < cp.getAnzahlStellplaetze()*2; i++){
 			for(int j = 1; j < columnName.length;j++){
 				if(dtm.getValueAt(i, j) != null){
-					System.out.println("null");
 					dtm.setValueAt(null, i, j);
 				}
 			}	

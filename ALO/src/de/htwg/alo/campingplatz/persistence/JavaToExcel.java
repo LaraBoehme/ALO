@@ -93,7 +93,6 @@ public class JavaToExcel {
 
 			Row kommentare = sheet.createRow(rownum++);
 				ArrayList<String> infosStellplatz = infos.get(key);
-				System.out.println("Tabelle malen: " + infos.get(key));
 				int zellnr = 0;
 				for (Object einzelneInfo : infosStellplatz) {
 					Cell zelle = kommentare.createCell(zellnr++);

@@ -1,9 +1,7 @@
 package de.htwg.alo.campingplatz.persistence;
 
-import de.htwg.alo.campingplatz.gui.Visitors;
 import de.htwg.alo.campingplatz.model.Campingplatz;
 import de.htwg.alo.campingplatz.model.Stellplatz;
-import de.htwg.alo.campingplatz.model.Stellplatz.DateItem;
 import de.htwg.alo.campingplatz.util.DateUtil;
 
 import java.io.BufferedWriter;
@@ -41,8 +39,6 @@ public class PersistenceXml {
 
 			Stellplatz.DateItem currItem = stellplatz.getBelegungen();
 			while (currItem != null) {
-				System.out.println("CurrItem fuer Xml: " + DateUtil.getInstance().formatDate(currItem.getDate()));
-				Stellplatz.DateItem myFirstItem = currItem;
 				sb.append("<Belegung>");
 				sb.append("<Stellplatz>" + stellplatzNr + "</Stellplatz>");
 				sb.append("<DatumVon>"
@@ -54,14 +50,12 @@ public class PersistenceXml {
 				Calendar calCurrItem = Calendar.getInstance();
 				calCurrItem.setTime(currItem.getDate());
 				int tagCurrItem = calCurrItem.get(Calendar.DAY_OF_YEAR);
-				System.out.println(tagCurrItem);
 				Calendar calCurrItemNext = Calendar.getInstance();
 	
 				while ((currItem.next != null)
 						&& (currItem.next.getName().equals(currItem.getName()) && currItem.next.getZusatzInfos().equals(currItem.getZusatzInfos()))) {
 					calCurrItemNext.setTime(currItem.next.getDate());
 					int tagCurrItemNext = calCurrItemNext.get(Calendar.DAY_OF_YEAR);
-					System.out.println(tagCurrItemNext);
 					if(tagCurrItemNext-tagCurrItem == 1){
 						dauer++;
 						currItem = currItem.next;
@@ -114,7 +108,6 @@ public class PersistenceXml {
 			doc.getDocumentElement().normalize();
 			
 			NodeList nList = doc.getElementsByTagName("Belegung");
-			System.out.println(nList.getLength());
 
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 
@@ -159,9 +152,7 @@ public class PersistenceXml {
 		DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 		
 		namen.add("" + (stellplatz));
-		System.out.println("Zu namen hinzugefügt: " + namen.get(0));
 		zusatzInfos.add("");
-		System.out.println("Zu zusatzInfos hinzugefügt: " + zusatzInfos.get(0));
 		
 		try {
 
@@ -175,7 +166,6 @@ public class PersistenceXml {
 			NodeList nList = doc.getElementsByTagName("Belegung");
 			
 				for (int temp = 0; temp < nList.getLength(); temp++) {     //läuft über alle Belegungen in xml
-					System.out.println("Belegungen hat diese Länge: " + belegungen.size());
 					
 					Node nNode = nList.item(temp);
 
@@ -183,31 +173,25 @@ public class PersistenceXml {
 						Element eElement = (Element) nNode;
 						
 						if(Integer.parseInt(eElement.getElementsByTagName("Stellplatz").item(0).getTextContent()) == stellplatz){
-							System.out.println("ja Stellplatz " + (stellplatz));
 							
 							String jahrBelegungString = eElement.getElementsByTagName("DatumVon").item(0).getTextContent().substring(6);
 							int jahrBelegung = Integer.parseInt(jahrBelegungString);
 							
 							if( jahrBelegung == jahr){
-								System.out.println("Ja Jahre stimmern überein");
 								
 								String monatBelegungString = eElement.getElementsByTagName("DatumVon").item(0).getTextContent().substring(3,5);
 								int monatBelegung = Integer.parseInt(monatBelegungString);
-								System.out.println("monatBelegung: "+ monatBelegung);
 								
 								String tagBelegungString = eElement.getElementsByTagName("DatumVon").item(0).getTextContent().substring(0,2);
 								int tagBelegung = Integer.parseInt(tagBelegungString);
 								
-								System.out.println("tagBelegung: "+ tagBelegung);
 							
 								GregorianCalendar calBelegung = new GregorianCalendar();
 								calBelegung.set(jahrBelegung, monatBelegung - 1, tagBelegung);
-								System.out.println("Datum Belegung: " + calBelegung.getTime());
 								
 								if(calBelegung.before(calGewollt)){
 									String dauerGewolltString = eElement.getElementsByTagName("Dauer").item(0).getTextContent();
-									int dauerGewollt = Integer.parseInt(dauerGewolltString);
-									System.out.println("dauerGewollt " + dauerGewollt);
+									int dauerGewollt = Integer.parseInt(dauerGewolltString);								
 									for(int i = 0; i < dauerGewollt; i++){
 										int neuerMonatBelegung = calBelegung.get(Calendar.MONTH) + 1;
 										if(neuerMonatBelegung == monat){
@@ -215,7 +199,6 @@ public class PersistenceXml {
 											belegungen.add(String.valueOf(dauerGewollt-i));
 											belegungen.add(eElement.getElementsByTagName("Name").item(0).getTextContent());
 											belegungen.add(eElement.getElementsByTagName("Zusatzinformationen").item(0).getTextContent());
-											System.out.println("belegungen hat diese Länge: " + belegungen.size());
 											break;
 										}else{
 											calBelegung.add(Calendar.DATE, 1);
@@ -224,12 +207,10 @@ public class PersistenceXml {
 								}
 								
 								if(monatBelegung == monat){
-									System.out.println("Ja Monate stimmen überein");
 									belegungen.add(eElement.getElementsByTagName("DatumVon").item(0).getTextContent());
 									belegungen.add(eElement.getElementsByTagName("Dauer").item(0).getTextContent());
 									belegungen.add(eElement.getElementsByTagName("Name").item(0).getTextContent());
 									belegungen.add(eElement.getElementsByTagName("Zusatzinformationen").item(0).getTextContent());
-									System.out.println("belegungen hat diese Länge: " + belegungen.size());
 								}
 							}
 							
@@ -248,9 +229,7 @@ public class PersistenceXml {
 					int anzahlBelegungen = belegungen.size();
 					
 					if(belegungen.size() != 0){
-						System.out.println("Belegungen size ist größer null, nämlich " + belegungen.size());
 						while(gc.get(Calendar.MONTH) == currentMonth){
-							System.out.println("Datum: " + gc.getTime());
 							
 							if(anzahlBelegungen > 0){
 								if(belegungen.get(datumZaehler).equalsIgnoreCase(df.format(gc.getTime()))){

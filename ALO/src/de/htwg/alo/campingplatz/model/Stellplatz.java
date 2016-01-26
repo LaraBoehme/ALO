@@ -1,9 +1,6 @@
 package de.htwg.alo.campingplatz.model;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +16,6 @@ public class Stellplatz {
 		String[] myBelegungen = new String[1000];
 		int i = 0;
 		while (currentItem != null) {
-			System.out.println(currentItem.getDate());
 			myBelegungen[i] = currentItem.getName() + "_"
 					+ DateUtil.getInstance().formatDate(currentItem.getDate());
 			i++;
@@ -49,16 +45,11 @@ public class Stellplatz {
 			lastItem = firstItem;
 
 		} else {
-			System.out.println("Datum: "+datum);
-			System.out.println("FirstItem: "+firstItem.getDate());
-			System.out.println("LastItem: "+lastItem.getDate());
-			System.out.println("Daten: "+ lastItem.getName() + " " + lastItem.getZusatzInfos());
 			
 			// neues Datum hinter dem bisherigen letzten 
 			if (lastItem.getDate().before(datum)) {	
 				lastItem.next = new DateItem(datum, name, zusatzInfos);
 				lastItem = lastItem.next;
-				System.out.println("if " + lastItem.getDate());
 				return;
 
 				// neues Datum vor dem ersten
@@ -66,24 +57,18 @@ public class Stellplatz {
 				DateItem tempItem = firstItem;
 				firstItem = new DateItem(datum, name, zusatzInfos);
 				firstItem.next = tempItem;
-				System.out.println("---- TEST DATUM VOR ERSTEN -----");
-
 			}
 		
 			DateItem currentItem = firstItem;
-			System.out.println("CurrentItem: "+currentItem.getDate());
 			while (currentItem.next != null) {
-				System.out.println("Ja hier bin ich");
 				// neues Datum nach dem Ersten und vor dem n�chsten
 				if (currentItem.getDate().before(datum)
 						&& currentItem.next.getDate().after(datum)) {
 					DateItem newDate = new DateItem(datum, name, zusatzInfos);
 					newDate.next = currentItem.next;
-					currentItem.next = newDate;
-					System.out.println("test--1");					/*NEU*/
+					currentItem.next = newDate;			/*NEU*/
 				} else {
-					System.out.println("test--2");					/*NEU*/
-					System.out.println(currentItem.name);			/*NEU*/
+							/*NEU*/
 					
 				}
 				currentItem = currentItem.next;
@@ -105,14 +90,12 @@ public class Stellplatz {
 			} else {
 				tempItem = firstItem.next;
 				nextItem = firstItem;
-				System.out.println("LastItem: "+lastItem.getDate());
 				while (tempItem != null) {
 					// L�schung des passenden Elementes
 					if (tempItem.getDate().compareTo(datum) == 0
 							&& tempItem.getName().equalsIgnoreCase(name)) {
 						if(lastItem.getDate().equals(tempItem.getDate())){
 							lastItem = nextItem;
-							System.out.println("lastItem neu gesetzt auf " +lastItem.getDate());
 						}
 						nextItem.next = tempItem.next;
 						return 1;
@@ -129,7 +112,6 @@ public class Stellplatz {
 
 	public int checkAvailabilitySP(Date datum) {
 		if (firstItem == null){
-			System.out.println("return  -1‚");
 			return -1;
 		}
 			

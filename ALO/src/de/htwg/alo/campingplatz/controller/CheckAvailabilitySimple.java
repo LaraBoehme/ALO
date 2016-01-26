@@ -21,7 +21,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 	
 	
 	@Override
-	public boolean checkAvailability(ArrayList<Stellplatz> stellplaetze, Date datum,     //Stellplatz[] stellplaetze
+	public boolean checkAvailability(ArrayList<Stellplatz> stellplaetze, Date datum,    
 			int dauer, int limit, String name, String zusatzInfos) {
 
 		int besterStellplatz = 0;
@@ -61,24 +61,18 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 			Date datum, int dauer, int limit, String name, String zusatzInfos) {
 
 		int availability = stellplatz.checkAvailabilitySP(datum);
-		System.out.println(availability);
 
 		if (availability >= dauer || availability == -1) {
 			belegeStellplatz(stellplatz, datum, dauer, name, zusatzInfos);
 			anzahlAngenommen++;
-			System.out.println("true");
 			return true;
 		} else if (availability == 0) {
 			belegeStellplatz(stellplatz, datum, dauer, name, zusatzInfos);
 			anzahlAngenommen++;
 			return false;
-
-			// System.out.println("checkAvaiability: 0 -> bereits belegt");
 		} else {
 			belegeStellplatz(stellplatz, datum, dauer, name, zusatzInfos);
 			anzahlAngenommen++;
-			System.out
-					.println("checkAvailability: false ----- DAUER > VERFÜGBARKEIT");
 		}
 
 		freieTage = availability;
@@ -130,7 +124,7 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 			int stellplatzIndex, Date datum, int dauer, String name, String zusatzInfos) {
 
 		for (int j = 0; j < dauer; j++) {
-			belegeStellplatz(stellplaetze.get(stellplatzIndex), datum, dauer, name, zusatzInfos); /* WiSe14/15 */   //Lara statt j wird hier der stellplatzIndex übergeben
+			belegeStellplatz(stellplaetze.get(stellplatzIndex), datum, dauer, name, zusatzInfos); /* WiSe14/15 */  
 		}
 	}
 
@@ -159,16 +153,12 @@ public class CheckAvailabilitySimple implements ICheckAvailability {
 					// because of String[1000]
 					
 					if (belegung != null && belegung.length() > 2) {
-						System.out.println("belegung: "+ belegung);
 
 						for (DateItem dateItem : stellplatzBelegung) {
 							Date date = dateItem.getDate();
 							DateUtil dateUtil = DateUtil.getInstance();
-							System.out.println("datum: " + dateUtil.getMonth(date) + "\nexpected: "+ month);
 							if (dateUtil.getMonth(date).equals(month)) {
-								System.out.println("added date!");
 								belegungen.add(belegung);
-								System.out.println(belegungen.size());
 							}
 						}
 					}
