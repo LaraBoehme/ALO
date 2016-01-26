@@ -142,7 +142,7 @@ public class Campingplatz {
 	}
 	
 	//Stellplätze hinzufügen oder löschen
-	public void aendereAnzahlStellplaetze(int anzahlStellplaetze, String chosenXml){
+	public void aendereAnzahlStellplaetze(int anzahlStellplaetze){
 		if(stellplaetze.size() >= anzahlStellplaetze){
 			int anzahlLoeschen = stellplaetze.size()-anzahlStellplaetze;
 			int loeschen = stellplaetze.size() - 1;

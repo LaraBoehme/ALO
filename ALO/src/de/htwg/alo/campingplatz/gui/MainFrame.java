@@ -679,7 +679,7 @@ public class MainFrame {
 						}
 							int anzahlStellplaetze = Integer.parseInt(eingabeSp.getText());
 							cp.setAnzahlStellplaetze(anzahlStellplaetze);
-							cp.aendereAnzahlStellplaetze(anzahlStellplaetze, chosenXml);
+							cp.aendereAnzahlStellplaetze(anzahlStellplaetze);
 							
 							String[] neueStellplaetze = new String[anzahlStellplaetze];
 							for (int i = 0; i < cp.getAnzahlStellplaetze(); i++) {
@@ -705,6 +705,8 @@ public class MainFrame {
 							comboBox_sp.setModel(new DefaultComboBoxModel(neueStellplaetze));
 							
 							if (new File(chosenXml).exists()){
+								resetOberflaeche();
+								readXml(chosenXml);
 								initializeOberflaeche();
 							}
 							JOptionPane.showMessageDialog(null,
@@ -922,7 +924,7 @@ public class MainFrame {
 									.getSelectedIndex(), zusatzInfosEingabe.getText()); /* WiSe14/15 */
 
 					JOptionPane.showMessageDialog(null,
-							"<html>Buchung erfolgreich!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
+							"<html>Buchung erfolgreich!");
 					cp.belegungToXml(chosenXml);
 
 					initializeOberflaeche();
@@ -1015,7 +1017,7 @@ public class MainFrame {
 								"<html>Der Gast " + txtField_name_del
 										.getText() + " wurde ab dem Datum " + myDate + " vom Stellplatz " + platz
 								+ " für die angegebene Dauer von " + dauer
-								+ " Tag(en) gelöscht!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
+								+ " Tag(en) gelöscht!");
 						cp.belegungToXml(chosenXml);
 						resetOberflaeche();
 						initializeOberflaeche();
@@ -1026,7 +1028,7 @@ public class MainFrame {
 								"<html>Der Gast " + txtField_name_del
 										.getText() + " wurde ab dem Datum " + myDate + " vom Stellplatz " + platz
 								+ " entfernt, jedoch nicht für die angegebene Dauer von " + dauer
-								+ " Tag(en). Bitte überprüfen Sie den Belegungsplan!<br>Um die Änderungen anzuzeigen, bitte Belegungsplan erneut erstellen!");
+								+ " Tag(en). Bitte überprüfen Sie den Belegungsplan!");
 						cp.belegungToXml(chosenXml);
 						resetOberflaeche();
 						initializeOberflaeche();
