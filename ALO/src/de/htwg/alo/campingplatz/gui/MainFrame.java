@@ -131,8 +131,8 @@ public class MainFrame {
 		lblProtocol.setBounds(10, 780, 250, 20);
 
 		File jarFile = new File(MainFrame.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-
-		dataFolder = new File(jarFile.getAbsolutePath().replace(jarFile.getName(), "") + "data/");
+		// Drei Ordnerstrukturen hoch da Jar in Applikation/Content/MacOS liegt
+		dataFolder = new File(jarFile.getAbsolutePath().replace(jarFile.getName(), "") +"../" +"../" +"../" +"data/");
 
 		if (!dataFolder.exists()) {
 			dataFolder.mkdirs();
